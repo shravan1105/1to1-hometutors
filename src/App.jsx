@@ -200,29 +200,121 @@ function Logo({ onClick, size="md" }) {
 
 /* ─── Nav ───────────────────────────────────────────────────────────── */
 function Nav({ page, setPage }) {
-  const links=[{id:"home",l:"Home"},{id:"about",l:"About"},{id:"tutors",l:"Tutors"},{id:"courses",l:"Courses"},{id:"inquiry",l:"Book Counselling"},{id:"join",l:"Join as Tutor"},{id:"admin",l:"Admin"}];
+  const [menuOpen, setMenuOpen] = useState(false);
+  const links = [
+    { id:"home",    l:"Home" },
+    { id:"about",   l:"About" },
+    { id:"tutors",  l:"Tutors" },
+    { id:"courses", l:"Courses" },
+    { id:"inquiry", l:"Book Counselling", highlight: true },
+    { id:"join",    l:"Join as Tutor" },
+    { id:"admin",   l:"Admin" },
+  ];
+
+  const navigate = (id) => { setPage(id); setMenuOpen(false); };
+
   return (
-    <nav style={{background:C.navy,borderBottom:`3px solid ${C.gold}`,position:"sticky",top:0,zIndex:200,boxShadow:"0 4px 24px rgba(0,0,0,.4)"}}>
-      <div style={{maxWidth:1200,margin:"0 auto",padding:"0 1.5rem",display:"flex",alignItems:"center",justifyContent:"space-between",height:68}}>
-        <Logo onClick={()=>setPage("home")}/>
-        <div style={{display:"flex",gap:3,flexWrap:"wrap"}}>
-          {links.map(lk=>(
-            <button key={lk.id} onClick={()=>setPage(lk.id)}
-              style={{background:page===lk.id?C.gold:lk.id==="inquiry"?`${C.gold}20`:"transparent",color:page===lk.id?C.navy:lk.id==="inquiry"?C.goldLight:"#CBD5E0",border:lk.id==="inquiry"?`1.5px solid ${C.gold}44`:"none",borderRadius:6,padding:"7px 12px",cursor:"pointer",fontSize:12,fontFamily:"sans-serif",fontWeight:600,transition:"all .15s"}}>
-              {lk.l}
-            </button>
-          ))}
+    <>
+      <style>{`
+        @media (max-width: 768px) {
+          .nav-desktop-links { display: none !important; }
+          .nav-hamburger      { display: flex !important; }
+          .nav-contact-bar span.hide-mobile { display: none !important; }
+        }
+        @media (min-width: 769px) {
+          .nav-hamburger      { display: none !important; }
+          .nav-mobile-menu    { display: none !important; }
+        }
+        .nav-mobile-menu-item:hover { background: rgba(255,255,255,.08) !important; }
+        .nav-hamburger-line {
+          display: block; width: 22px; height: 2px;
+          background: #CBD5E0; border-radius: 2px;
+          transition: all .25s;
+        }
+        .ham-open .nav-hamburger-line:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+        .ham-open .nav-hamburger-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .ham-open .nav-hamburger-line:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+        @keyframes slideDown {
+          from { opacity: 0; transform: translateY(-8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+
+      <nav style={{ background:C.navy, borderBottom:`3px solid ${C.gold}`, position:"sticky", top:0, zIndex:300, boxShadow:"0 4px 24px rgba(0,0,0,.4)" }}>
+
+        {/* ── Main bar ── */}
+        <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1.25rem", display:"flex", alignItems:"center", justifyContent:"space-between", height:66 }}>
+
+          {/* Logo */}
+          <Logo onClick={() => navigate("home")} />
+
+          {/* Desktop links */}
+          <div className="nav-desktop-links" style={{ display:"flex", gap:3 }}>
+            {links.map(lk => (
+              <button key={lk.id} onClick={() => navigate(lk.id)}
+                style={{ background: page===lk.id ? C.gold : lk.highlight ? `${C.gold}20` : "transparent", color: page===lk.id ? C.navy : lk.highlight ? C.goldLight : "#CBD5E0", border: lk.highlight ? `1.5px solid ${C.gold}44` : "none", borderRadius:6, padding:"7px 12px", cursor:"pointer", fontSize:12, fontFamily:"sans-serif", fontWeight:600, transition:"all .15s" }}>
+                {lk.l}
+              </button>
+            ))}
+          </div>
+
+          {/* Hamburger button — mobile only */}
+          <button
+            className={`nav-hamburger ${menuOpen ? "ham-open" : ""}`}
+            onClick={() => setMenuOpen(o => !o)}
+            style={{ display:"none", flexDirection:"column", gap:6, background:"none", border:`1.5px solid rgba(255,255,255,.2)`, borderRadius:8, padding:"9px 10px", cursor:"pointer", alignItems:"center", justifyContent:"center", flexShrink:0 }}
+            aria-label="Toggle menu">
+            <span className="nav-hamburger-line" />
+            <span className="nav-hamburger-line" />
+            <span className="nav-hamburger-line" />
+          </button>
         </div>
-      </div>
-      <div style={{background:`${C.gold}15`,borderTop:`1px solid ${C.gold}28`,padding:"5px 1.5rem",display:"flex",alignItems:"center",justifyContent:"center",gap:10,fontFamily:"sans-serif",fontSize:12,flexWrap:"wrap"}}>
-        <span style={{color:C.gold}}>📞</span><span style={{color:"#94A3B8"}}>Call/WhatsApp:</span>
-        <strong style={{color:C.goldLight}}>+91 98765 43210</strong>
-        <span style={{color:"#334155",margin:"0 6px"}}>|</span>
-        <span style={{color:"#94A3B8"}}>✉ info@1to1hometutors.in</span>
-        <span style={{color:"#334155",margin:"0 6px"}}>|</span>
-        <span style={{color:"#94A3B8"}}>🕐 Mon–Sat 9AM–7PM</span>
-      </div>
-    </nav>
+
+        {/* ── Contact strip ── */}
+        <div className="nav-contact-bar" style={{ background:`${C.gold}15`, borderTop:`1px solid ${C.gold}28`, padding:"5px 1.25rem", display:"flex", alignItems:"center", justifyContent:"center", gap:8, fontFamily:"sans-serif", fontSize:12, flexWrap:"wrap" }}>
+          <span style={{ color:C.gold }}>📞</span>
+          <span style={{ color:"#94A3B8" }}>Call/WhatsApp:</span>
+          <strong style={{ color:C.goldLight }}>+91 98765 43210</strong>
+          <span className="hide-mobile" style={{ color:"#334155", margin:"0 4px" }}>|</span>
+          <span className="hide-mobile" style={{ color:"#94A3B8" }}>✉ info@1to1hometutors.in</span>
+          <span className="hide-mobile" style={{ color:"#334155", margin:"0 4px" }}>|</span>
+          <span className="hide-mobile" style={{ color:"#94A3B8" }}>🕐 Mon–Sat 9AM–7PM</span>
+        </div>
+
+        {/* ── Mobile dropdown menu ── */}
+        {menuOpen && (
+          <div
+            className="nav-mobile-menu"
+            style={{ background:C.navyDeep, borderTop:`1px solid ${C.gold}33`, padding:"8px 0 12px", animation:"slideDown .25s ease" }}>
+            {links.map(lk => (
+              <button
+                key={lk.id}
+                className="nav-mobile-menu-item"
+                onClick={() => navigate(lk.id)}
+                style={{ width:"100%", background: page===lk.id ? `${C.gold}18` : "transparent", color: page===lk.id ? C.gold : lk.highlight ? C.goldLight : "#CBD5E0", border:"none", borderLeft: page===lk.id ? `3px solid ${C.gold}` : "3px solid transparent", padding:"13px 24px", cursor:"pointer", fontSize:15, fontFamily:"sans-serif", fontWeight: page===lk.id ? 700 : 500, textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between", transition:"background .15s" }}>
+                {lk.l}
+                {page === lk.id && <span style={{ color:C.gold, fontSize:16 }}>✓</span>}
+                {lk.highlight && page !== lk.id && (
+                  <span style={{ background:C.gold, color:C.navyDeep, fontSize:9, fontWeight:700, padding:"3px 8px", borderRadius:12, letterSpacing:".06em", textTransform:"uppercase" }}>Free</span>
+                )}
+              </button>
+            ))}
+
+            {/* Contact info inside mobile menu */}
+            <div style={{ margin:"10px 20px 0", padding:"12px 16px", background:`${C.white}06`, borderRadius:10, border:`1px solid ${C.gold}22` }}>
+              <div style={{ color:C.gold, fontSize:13, fontWeight:700, fontFamily:"sans-serif", marginBottom:6 }}>📞 +91 98765 43210</div>
+              <div style={{ color:"#94A3B8", fontSize:12, fontFamily:"sans-serif", marginBottom:3 }}>✉ info@1to1hometutors.in</div>
+              <div style={{ color:"#94A3B8", fontSize:12, fontFamily:"sans-serif" }}>🕐 Mon–Sat, 9 AM – 7 PM</div>
+              <button
+                onClick={() => { window.open("https://wa.me/919876543210"); setMenuOpen(false); }}
+                style={{ marginTop:10, width:"100%", background:"#25D366", color:C.white, border:"none", borderRadius:8, padding:"10px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"sans-serif" }}>
+                💬 WhatsApp Us Now
+              </button>
+            </div>
+          </div>
+        )}
+      </nav>
+    </>
   );
 }
 
