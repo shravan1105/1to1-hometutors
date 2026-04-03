@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { submitEnquiry, submitTutorApplication } from "./submitHandlers";
 
 /* ─── Design Tokens ─────────────────────────────────────────────────── */
 const C = {
@@ -921,45 +922,235 @@ function Courses({ setPage }) {
   );
 }
 
-/* ─── Inquiry Form ───────────────────────────────────────────────────── */
+
+
+/* ─── Inquiry ────────────────────────────────────────────────────────── */
 function Inquiry() {
-  const [f,setF]=useState({name:"",parent:"",phone:"",email:"",class_:"",board:"",subjects:"",area:"",type:"Long Term",msg:""});
-  const [done,setDone]=useState(false);
-  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
-  const classes=["Class 6","Class 7","Class 8","Class 9","Class 10","Class 11","Class 12","JEE Mains","JEE Advanced","NEET"];
+  const [f, setF] = useState({
+    name: "", parent: "", phone: "", email: "",
+    class_: "", board: "", subjects: "", area: "",
+    type: "Long Term", msg: ""
+  });
+  const [done, setDone]       = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr]         = useState("");
+  const set = k => e => setF(p => ({ ...p, [k]: e.target.value }));
+
+  const classes = [
+    "Class 6","Class 7","Class 8","Class 9","Class 10",
+    "Class 11","Class 12","JEE Mains","JEE Advanced","NEET"
+  ];
+
+  const handleSubmit = async () => {
+    if (!f.name || !f.phone) {
+      setErr("Please enter your name and phone number.");
+      return;
+    }
+    setErr("");
+    setLoading(true);
+    try {
+      const result = await submitEnquiry(f);
+      if (result.success) {
+        setDone(true);
+      } else {
+        setErr("Something went wrong. Please WhatsApp us directly.");
+      }
+    } catch (e) {
+      setErr("Network error. Please check your connection and try again.");
+    }
+    setLoading(false);
+  };
+
+  const wrapStyle = {
+    maxWidth: 760,
+    margin: "0 auto",
+    padding: "52px 1.5rem"
+  };
+
+  const cardStyle = {
+    background: C.white,
+    borderRadius: 16,
+    border: "1px solid " + C.border,
+    padding: "36px 44px",
+    boxShadow: "0 4px 24px rgba(0,0,0,.06)"
+  };
+
+  const gridStyle = {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 18
+  };
+
+  const noteStyle = {
+    background: C.goldPale,
+    border: "1px solid " + C.gold,
+    borderRadius: 8,
+    padding: "11px 16px",
+    marginTop: 14,
+    fontFamily: "sans-serif",
+    fontSize: 13,
+    color: "#7A5C00"
+  };
+
+  const errStyle = {
+    background: "#FEF2F2",
+    border: "1.5px solid #FCA5A5",
+    borderRadius: 8,
+    padding: "11px 16px",
+    marginTop: 14,
+    fontFamily: "sans-serif",
+    fontSize: 13,
+    color: "#991B1B"
+  };
+
+  const btnStyle = {
+    marginTop: 18,
+    width: "100%",
+    background: loading ? "#94A3B8" : C.navy,
+    color: C.white,
+    border: "none",
+    borderRadius: 8,
+    padding: "14px",
+    fontSize: 15,
+    fontWeight: 700,
+    cursor: loading ? "not-allowed" : "pointer",
+    fontFamily: "sans-serif",
+    transition: "background .2s"
+  };
+
+  const successStyle = {
+    background: C.greenBg,
+    border: "1.5px solid #6EE7B7",
+    borderRadius: 10,
+    padding: "32px",
+    textAlign: "center",
+    color: C.green,
+    fontFamily: "sans-serif"
+  };
+
+  const subStyle = {
+    textAlign: "center",
+    fontSize: 12,
+    color: C.muted,
+    fontFamily: "sans-serif",
+    marginTop: 12
+  };
+
   return (
-    <div style={{maxWidth:760,margin:"0 auto",padding:"52px 1.5rem"}}>
-      <H2>Book a Free Counselling Session</H2><Line/>
-      <div style={{background:C.white,borderRadius:16,border:`1px solid ${C.border}`,padding:"36px clamp(1.5rem,4vw,44px)",boxShadow:"0 4px 24px rgba(0,0,0,.06)"}}>
-        <p style={{fontFamily:"sans-serif",color:C.muted,fontSize:14,marginBottom:26}}>Fill in your details. Our counsellor calls within 24 hours to understand your requirements and guide you to the right tutor and plan — completely free, no commitment.</p>
+    <div style={wrapStyle}>
+      <H2>Book a Free Counselling Session</H2>
+      <Line />
+      <div style={cardStyle}>
+        <p style={{ fontFamily: "sans-serif", color: C.muted, fontSize: 14, marginBottom: 26 }}>
+          Fill in your details. Our counsellor calls within 24 hours — completely free, no commitment.
+        </p>
+
         {done ? (
-          <div style={{background:C.greenBg,border:`1.5px solid #6EE7B7`,borderRadius:10,padding:"28px",textAlign:"center",color:C.green,fontFamily:"sans-serif"}}>
-            <div style={{fontSize:36,marginBottom:10}}>✅</div>
-            <strong style={{fontSize:16}}>Counselling Session Booked!</strong>
-            <p style={{margin:"10px 0 6px",fontSize:14}}>Our academic counsellor will call you within 24 hours.</p>
-            <p style={{fontSize:12,color:"#065f46"}}>Reference: 1T1-{Date.now().toString().slice(-6)}</p>
+          <div style={successStyle}>
+            <div style={{ fontSize: 48, marginBottom: 14 }}>✅</div>
+            <strong style={{ fontSize: 18 }}>Counselling Session Booked!</strong>
+            <p style={{ margin: "12px 0 6px", fontSize: 14 }}>
+              Our counsellor will call <strong>{f.phone}</strong> within 24 hours.
+            </p>
+            <p style={{ fontSize: 12, color: "#065f46" }}>
+              Reference ID: 1T1-{Date.now().toString().slice(-6)}
+            </p>
           </div>
-        ):(
-          <>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:18}}>
-              {[{l:"Student Name *",k:"name",p:"Full name",t:"text"},{l:"Parent Name",k:"parent",p:"Parent / Guardian",t:"text"},{l:"Phone Number *",k:"phone",p:"+91 XXXXX XXXXX",t:"tel"},{l:"Email",k:"email",p:"email@example.com",t:"email"}].map(({l,k,p,t})=>(
-                <div key={k}><label style={LBL}>{l}</label><input style={INP} type={t} placeholder={p} value={f[k]} onChange={set(k)}/></div>
-              ))}
-              <div><label style={LBL}>Class / Exam</label><select style={INP} value={f.class_} onChange={set("class_")}><option value="">Select</option>{classes.map(c=><option key={c}>{c}</option>)}</select></div>
-              <div><label style={LBL}>Board</label><select style={INP} value={f.board} onChange={set("board")}><option value="">Select board</option><option>CBSE</option><option>Maharashtra State Board</option><option>JEE / NEET</option></select></div>
-              <div><label style={LBL}>Subjects Needed</label><input style={INP} placeholder="e.g. Physics, Maths" value={f.subjects} onChange={set("subjects")}/></div>
-              <div><label style={LBL}>Your Area in Nagpur</label><select style={INP} value={f.area} onChange={set("area")}><option value="">Select area</option>{AREAS.map(a=><option key={a}>{a}</option>)}</select></div>
-              <div style={{gridColumn:"1 / -1"}}><label style={LBL}>Course Type</label><select style={INP} value={f.type} onChange={set("type")}>{["Long Term","Short Term","Flexible / Single Subject"].map(t=><option key={t}>{t}</option>)}</select></div>
-              <div style={{gridColumn:"1 / -1"}}><label style={LBL}>Additional Requirements</label><textarea style={{...INP,resize:"vertical",minHeight:80}} placeholder="Preferred schedule, specific topics…" value={f.msg} onChange={set("msg")}/></div>
+        ) : (
+          <div>
+            <div style={gridStyle}>
+
+              <div>
+                <label style={LBL}>Student Name *</label>
+                <input style={INP} type="text" placeholder="Full name"
+                  value={f.name} onChange={set("name")} />
+              </div>
+
+              <div>
+                <label style={LBL}>Parent Name</label>
+                <input style={INP} type="text" placeholder="Parent / Guardian"
+                  value={f.parent} onChange={set("parent")} />
+              </div>
+
+              <div>
+                <label style={LBL}>Phone Number *</label>
+                <input style={INP} type="tel" placeholder="+91 XXXXX XXXXX"
+                  value={f.phone} onChange={set("phone")} />
+              </div>
+
+              <div>
+                <label style={LBL}>Email</label>
+                <input style={INP} type="email" placeholder="email@example.com"
+                  value={f.email} onChange={set("email")} />
+              </div>
+
+              <div>
+                <label style={LBL}>Class / Exam</label>
+                <select style={INP} value={f.class_} onChange={set("class_")}>
+                  <option value="">Select class or exam</option>
+                  {classes.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label style={LBL}>Board</label>
+                <select style={INP} value={f.board} onChange={set("board")}>
+                  <option value="">Select board</option>
+                  <option value="CBSE">CBSE</option>
+                  <option value="Maharashtra State Board">Maharashtra State Board</option>
+                  <option value="JEE / NEET (Competitive)">JEE / NEET (Competitive)</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={LBL}>Subjects Needed</label>
+                <input style={INP} type="text" placeholder="e.g. Physics, Chemistry, Maths"
+                  value={f.subjects} onChange={set("subjects")} />
+              </div>
+
+              <div>
+                <label style={LBL}>Your Area in Nagpur</label>
+                <select style={INP} value={f.area} onChange={set("area")}>
+                  <option value="">Select your area</option>
+                  {AREAS.map(a => <option key={a} value={a}>{a}</option>)}
+                </select>
+              </div>
+
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label style={LBL}>Course Type</label>
+                <select style={INP} value={f.type} onChange={set("type")}>
+                  <option value="Long Term">Long Term</option>
+                  <option value="Short Term">Short Term</option>
+                  <option value="Flexible / Single Subject">Flexible / Single Subject</option>
+                </select>
+              </div>
+
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label style={LBL}>Additional Requirements</label>
+                <textarea
+                  style={{ border: "1.5px solid " + C.border, borderRadius: 8, padding: "10px 14px", fontSize: 14, fontFamily: "sans-serif", color: C.text, outline: "none", background: C.off, width: "100%", boxSizing: "border-box", resize: "vertical", minHeight: 80 }}
+                  placeholder="Preferred schedule, specific topics, or any other info…"
+                  value={f.msg}
+                  onChange={set("msg")}
+                />
+              </div>
+
             </div>
-            <div style={{background:C.goldPale,border:`1px solid ${C.gold}55`,borderRadius:8,padding:"12px 16px",marginTop:14,fontFamily:"sans-serif",fontSize:13,color:"#7A5C00"}}>
+
+            {err ? <div style={errStyle}>⚠️ {err}</div> : null}
+
+            <div style={noteStyle}>
               💡 <strong>No fees during counselling.</strong> Pricing is personalised and shared on the call.
             </div>
-            <button onClick={()=>{if(!f.name||!f.phone){alert("Please enter name and phone.");return;}setDone(true);}} style={{marginTop:18,width:"100%",background:C.navy,color:C.white,border:"none",borderRadius:8,padding:"14px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"sans-serif",boxShadow:"0 4px 14px rgba(11,31,78,.3)"}}>
-              Book Free Counselling Session
+
+            <button onClick={handleSubmit} disabled={loading} style={btnStyle}>
+              {loading ? "⏳ Submitting — please wait..." : "Book Free Counselling Session"}
             </button>
-            <p style={{textAlign:"center",fontSize:12,color:C.muted,fontFamily:"sans-serif",marginTop:12}}>Or WhatsApp: <strong style={{color:C.navy}}>+91 98765 43210</strong></p>
-          </>
+
+            <p style={subStyle}>
+              Or WhatsApp: <strong style={{ color: C.navy }}>+91 YOUR_REAL_NUMBER</strong>
+            </p>
+          </div>
         )}
       </div>
     </div>
@@ -968,38 +1159,166 @@ function Inquiry() {
 
 /* ─── Join ───────────────────────────────────────────────────────────── */
 function Join() {
-  const [f,setF]=useState({name:"",phone:"",email:"",qual:"",subjects:"",classes:"",area:"",exp:"",avail:"",about:""});
-  const [done,setDone]=useState(false);
-  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
+  const [f, setF] = useState({
+    name: "", phone: "", email: "", qual: "",
+    subjects: "", classes: "", area: "", exp: "", avail: "", about: ""
+  });
+  const [done, setDone]       = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr]         = useState("");
+  const set = k => e => setF(p => ({ ...p, [k]: e.target.value }));
+
+  const handleSubmit = async () => {
+    if (!f.name || !f.phone) {
+      setErr("Please enter your name and phone number.");
+      return;
+    }
+    setErr("");
+    setLoading(true);
+    try {
+      const result = await submitTutorApplication(f);
+      if (result.success) {
+        setDone(true);
+      } else {
+        setErr("Something went wrong. Please WhatsApp us directly.");
+      }
+    } catch (e) {
+      setErr("Network error. Please check your connection and try again.");
+    }
+    setLoading(false);
+  };
+
+  const wrapStyle = {
+    maxWidth: 760,
+    margin: "0 auto",
+    padding: "52px 1.5rem"
+  };
+
+  const cardStyle = {
+    background: C.white,
+    borderRadius: 16,
+    border: "1px solid " + C.border,
+    padding: "36px 44px"
+  };
+
+  const gridStyle = {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 18
+  };
+
+  const btnStyle = {
+    marginTop: 20,
+    width: "100%",
+    background: loading ? "#94A3B8" : C.navy,
+    color: C.white,
+    border: "none",
+    borderRadius: 8,
+    padding: "14px",
+    fontSize: 15,
+    fontWeight: 700,
+    cursor: loading ? "not-allowed" : "pointer",
+    fontFamily: "sans-serif"
+  };
+
+  const errStyle = {
+    background: "#FEF2F2",
+    border: "1.5px solid #FCA5A5",
+    borderRadius: 8,
+    padding: "11px 16px",
+    marginTop: 14,
+    fontFamily: "sans-serif",
+    fontSize: 13,
+    color: "#991B1B"
+  };
+
+  const successStyle = {
+    background: C.greenBg,
+    border: "1.5px solid #6EE7B7",
+    borderRadius: 10,
+    padding: "28px",
+    textAlign: "center",
+    color: C.green,
+    fontFamily: "sans-serif"
+  };
+
+  const fields = [
+    { l: "Full Name *",      k: "name",     p: "Your full name",            t: "text"   },
+    { l: "Phone *",          k: "phone",    p: "+91 XXXXX XXXXX",           t: "tel"    },
+    { l: "Email",            k: "email",    p: "email@example.com",         t: "email"  },
+    { l: "Qualification",    k: "qual",     p: "e.g. M.Sc., B.Tech, B.Ed.", t: "text"   },
+    { l: "Subjects",         k: "subjects", p: "Maths, Physics, English…",  t: "text"   },
+    { l: "Experience (yrs)", k: "exp",      p: "Years of teaching",         t: "number" },
+  ];
+
   return (
-    <div style={{maxWidth:760,margin:"0 auto",padding:"52px 1.5rem"}}>
-      <H2>Join as a Home Tutor</H2><Line/>
-      <div style={{background:C.navy,borderRadius:12,padding:"18px 22px",marginBottom:26,display:"flex",gap:20,flexWrap:"wrap"}}>
-        {["Flexible Hours","Competitive Pay","Momentum Brand Backing","All Nagpur Areas"].map(b=>(
-          <div key={b} style={{display:"flex",alignItems:"center",gap:7,color:"#CBD5E0",fontFamily:"sans-serif",fontSize:12.5}}><span style={{color:C.gold}}>✦</span>{b}</div>
+    <div style={wrapStyle}>
+      <H2>Join as a Home Tutor</H2>
+      <Line />
+      <div style={{ background: C.navy, borderRadius: 12, padding: "18px 22px", marginBottom: 26, display: "flex", gap: 20, flexWrap: "wrap" }}>
+        {["Flexible Hours", "Competitive Pay", "Momentum Brand Backing", "All Nagpur Areas"].map(b => (
+          <div key={b} style={{ display: "flex", alignItems: "center", gap: 7, color: "#CBD5E0", fontFamily: "sans-serif", fontSize: 12.5 }}>
+            <span style={{ color: C.gold }}>✦</span>{b}
+          </div>
         ))}
       </div>
-      <div style={{background:C.white,borderRadius:16,border:`1px solid ${C.border}`,padding:"36px clamp(1.5rem,4vw,44px)"}}>
-        {done?(
-          <div style={{background:C.greenBg,border:`1.5px solid #6EE7B7`,borderRadius:10,padding:"28px",textAlign:"center",color:C.green,fontFamily:"sans-serif"}}>
-            <div style={{fontSize:36,marginBottom:10}}>✅</div>
-            <strong style={{fontSize:16}}>Application Received!</strong>
-            <p style={{margin:"10px 0 6px",fontSize:14}}>Our team will review your profile within 48 hours.</p>
-            <p style={{fontSize:12}}>ID: 1T1-T-{Date.now().toString().slice(-6)}</p>
+      <div style={cardStyle}>
+        {done ? (
+          <div style={successStyle}>
+            <div style={{ fontSize: 36, marginBottom: 10 }}>✅</div>
+            <strong style={{ fontSize: 16 }}>Application Received!</strong>
+            <p style={{ margin: "10px 0 6px", fontSize: 14 }}>Our team will review your profile within 48 hours.</p>
+            <p style={{ fontSize: 12 }}>ID: 1T1-T-{Date.now().toString().slice(-6)}</p>
           </div>
-        ):(
-          <>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:18}}>
-              {[{l:"Full Name *",k:"name",p:"Your full name",t:"text"},{l:"Phone *",k:"phone",p:"+91 XXXXX XXXXX",t:"tel"},{l:"Email",k:"email",p:"email@example.com",t:"email"},{l:"Qualification",k:"qual",p:"e.g. M.Sc., B.Tech, B.Ed.",t:"text"},{l:"Subjects",k:"subjects",p:"Maths, Physics, English…",t:"text"},{l:"Experience (yrs)",k:"exp",p:"Years of teaching",t:"number"}].map(({l,k,p,t})=>(
-                <div key={k}><label style={LBL}>{l}</label><input style={INP} type={t} placeholder={p} value={f[k]} onChange={set(k)}/></div>
+        ) : (
+          <div>
+            <div style={gridStyle}>
+
+              {fields.map(({ l, k, p, t }) => (
+                <div key={k}>
+                  <label style={LBL}>{l}</label>
+                  <input style={INP} type={t} placeholder={p} value={f[k]} onChange={set(k)} />
+                </div>
               ))}
-              <div><label style={LBL}>Classes / Exams</label><input style={INP} placeholder="e.g. Class 6–10, JEE, NEET" value={f.classes} onChange={set("classes")}/></div>
-              <div><label style={LBL}>Your Area</label><select style={INP} value={f.area} onChange={set("area")}><option value="">Select area</option>{AREAS.map(a=><option key={a}>{a}</option>)}</select></div>
-              <div style={{gridColumn:"1 / -1"}}><label style={LBL}>Availability</label><input style={INP} placeholder="e.g. Weekdays 4–8 PM, Weekends" value={f.avail} onChange={set("avail")}/></div>
-              <div style={{gridColumn:"1 / -1"}}><label style={LBL}>About You</label><textarea style={{...INP,resize:"vertical",minHeight:88}} placeholder="Background, teaching style, achievements…" value={f.about} onChange={set("about")}/></div>
+
+              <div>
+                <label style={LBL}>Classes / Exams</label>
+                <input style={INP} type="text" placeholder="e.g. Class 6–10, JEE, NEET"
+                  value={f.classes} onChange={set("classes")} />
+              </div>
+
+              <div>
+                <label style={LBL}>Your Area</label>
+                <select style={INP} value={f.area} onChange={set("area")}>
+                  <option value="">Select area</option>
+                  {AREAS.map(a => <option key={a} value={a}>{a}</option>)}
+                </select>
+              </div>
+
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label style={LBL}>Availability</label>
+                <input style={INP} type="text" placeholder="e.g. Weekdays 4–8 PM, Weekends"
+                  value={f.avail} onChange={set("avail")} />
+              </div>
+
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label style={LBL}>About You</label>
+                <textarea
+                  style={{ border: "1.5px solid " + C.border, borderRadius: 8, padding: "10px 14px", fontSize: 14, fontFamily: "sans-serif", color: C.text, outline: "none", background: C.off, width: "100%", boxSizing: "border-box", resize: "vertical", minHeight: 88 }}
+                  placeholder="Background, teaching style, achievements…"
+                  value={f.about}
+                  onChange={set("about")}
+                />
+              </div>
+
             </div>
-            <button onClick={()=>{if(!f.name||!f.phone){alert("Please enter name and phone.");return;}setDone(true);}} style={{marginTop:20,width:"100%",background:C.navy,color:C.white,border:"none",borderRadius:8,padding:"14px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"sans-serif"}}>Submit Application</button>
-          </>
+
+            {err ? <div style={errStyle}>⚠️ {err}</div> : null}
+
+            <button onClick={handleSubmit} disabled={loading} style={btnStyle}>
+              {loading ? "⏳ Submitting..." : "Submit Application"}
+            </button>
+          </div>
         )}
       </div>
     </div>
@@ -1008,45 +1327,291 @@ function Join() {
 
 /* ─── Admin ──────────────────────────────────────────────────────────── */
 function Admin() {
-  const [tab,setTab]=useState("inquiries");
+  const [unlocked, setUnlocked] = useState(false);
+  const [pwd, setPwd]           = useState("");
+  const [pwdError, setPwdError] = useState(false);
+  const [tab, setTab]           = useState("inquiries");
+  const [enquiries, setEnquiries]   = useState([]);
+  const [applications, setApps]     = useState([]);
+  const [boardEnqs, setBoardEnqs]   = useState([]);
+  const [loadingData, setLoadingData] = useState(false);
+  const ADMIN_PASSWORD = "Momentum@2025";
+
+  const tryUnlock = async () => {
+    if (pwd === ADMIN_PASSWORD) {
+      setUnlocked(true);
+      setPwdError(false);
+      setLoadingData(true);
+      try {
+        const { fetchEnquiries, fetchApplications, fetchBoardEnquiries } = await import("./submitHandlers");
+        const [enqs, apps, bEnqs] = await Promise.all([
+          fetchEnquiries(),
+          fetchApplications(),
+          fetchBoardEnquiries(),
+        ]);
+        setEnquiries(enqs);
+        setApps(apps);
+        setBoardEnqs(bEnqs);
+      } catch (e) {
+        console.error("Error loading data:", e);
+      }
+      setLoadingData(false);
+    } else {
+      setPwdError(true);
+      setPwd("");
+    }
+  };
+
+  const statusColors = {
+    new:       { bg:"#DBEAFE", text:"#1E40AF" },
+    contacted: { bg:"#FEF3C7", text:"#92400E" },
+    assigned:  { bg:"#DCFCE7", text:"#166534" },
+    pending:   { bg:"#DBEAFE", text:"#1E40AF" },
+    review:    { bg:"#FEF3C7", text:"#92400E" },
+    approved:  { bg:"#DCFCE7", text:"#166534" },
+  };
+
+  const getStatus = (s) => statusColors[s] || { bg:"#F3F4F6", text:"#374151" };
+
+  const cardStyle = {
+    background: C.white,
+    border: "1px solid " + C.border,
+    borderRadius: 12,
+    padding: "18px 22px",
+    marginBottom: 12
+  };
+
+  const nameStyle = { fontSize:15, fontWeight:700, color:C.navy };
+  const idStyle   = { fontSize:12, color:C.muted, fontFamily:"sans-serif" };
+  const metaStyle = { display:"flex", gap:18, flexWrap:"wrap", fontFamily:"sans-serif", fontSize:13, color:C.muted };
+
+  if (!unlocked) {
+    return (
+      <div style={{ minHeight:"70vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"2rem" }}>
+        <div style={{ background:C.white, borderRadius:20, border:"1px solid " + C.border, padding:"48px 40px", maxWidth:400, width:"100%", textAlign:"center", boxShadow:"0 8px 32px rgba(0,0,0,.08)" }}>
+          <div style={{ width:64, height:64, borderRadius:"50%", background:C.navy, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 20px", fontSize:28 }}>🔒</div>
+          <h2 style={{ color:C.navy, fontFamily:"'Playfair Display',Georgia,serif", fontSize:22, marginBottom:6 }}>Admin Access</h2>
+          <p style={{ color:C.muted, fontFamily:"sans-serif", fontSize:13, marginBottom:24 }}>Restricted to authorised team members only.</p>
+          <input
+            type="password"
+            placeholder="Enter admin password"
+            value={pwd}
+            onChange={e => { setPwd(e.target.value); setPwdError(false); }}
+            onKeyDown={e => { if (e.key === "Enter") tryUnlock(); }}
+            style={{ border: pwdError ? "1.5px solid #EF4444" : "1.5px solid " + C.border, borderRadius:8, padding:"12px 14px", fontSize:16, fontFamily:"sans-serif", color:C.text, outline:"none", background:C.off, width:"100%", boxSizing:"border-box", marginBottom: pwdError ? 8 : 16, textAlign:"center", letterSpacing:"0.15em" }}
+          />
+          {pwdError && <p style={{ color:"#EF4444", fontSize:12, fontFamily:"sans-serif", marginBottom:12 }}>Incorrect password. Please try again.</p>}
+          <button onClick={tryUnlock}
+            style={{ width:"100%", background:C.navy, color:C.white, border:"none", borderRadius:8, padding:"13px", fontSize:15, fontWeight:700, cursor:"pointer", fontFamily:"sans-serif" }}>
+            Login to Dashboard
+          </button>
+          <p style={{ color:C.muted, fontSize:11, fontFamily:"sans-serif", marginTop:16 }}>
+            Contact your web administrator if you forgot the password.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const totalEnqs = enquiries.length + boardEnqs.length;
+  const newEnqs   = enquiries.filter(e => e.status === "new").length +
+                    boardEnqs.filter(e => e.status === "new").length;
+
   return (
-    <div style={{maxWidth:1100,margin:"0 auto",padding:"52px 1.5rem"}}>
+    <div style={{ maxWidth:1100, margin:"0 auto", padding:"52px 1.5rem" }}>
       <H2>Admin Dashboard</H2><Line/>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(155px,1fr))",gap:14,marginBottom:32}}>
-        {[["2","New Enquiries"],["4","Total Enquiries"],["1","Pending Applications"],["6","Active Tutors"],["All Nagpur","Areas Served"]].map(([v,l])=>(
-          <div key={l} style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:12,padding:"17px 18px"}}>
-            <div style={{fontSize:24,fontWeight:700,color:C.navy,fontFamily:"'Playfair Display',Georgia,serif"}}>{v}</div>
-            <div style={{fontSize:12,color:C.muted,fontFamily:"sans-serif",marginTop:3}}>{l}</div>
+
+      {loadingData ? (
+        <div style={{ textAlign:"center", padding:"60px 0", fontFamily:"sans-serif", color:C.muted }}>
+          ⏳ Loading live data from Firebase...
+        </div>
+      ) : (
+        <div>
+          {/* Metric cards */}
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(155px,1fr))", gap:14, marginBottom:32 }}>
+            {[
+              [String(newEnqs),          "New Enquiries",         C.gold],
+              [String(totalEnqs),        "Total Enquiries",       C.navy],
+              [String(applications.length), "Tutor Applications", C.navyLight],
+              [String(boardEnqs.length), "Board Widget Enquiries",C.navy],
+            ].map(([v,l,col]) => (
+              <div key={l} style={{ background:C.white, border:"1px solid " + C.border, borderRadius:12, padding:"17px 18px" }}>
+                <div style={{ fontSize:28, fontWeight:700, color:col, fontFamily:"'Playfair Display',Georgia,serif" }}>{v}</div>
+                <div style={{ fontSize:12, color:C.muted, fontFamily:"sans-serif", marginTop:3 }}>{l}</div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <div style={{display:"flex",gap:8,marginBottom:24,background:C.off,borderRadius:10,padding:6,width:"fit-content"}}>
-        {[["inquiries","Enquiries"],["applications","Applications"]].map(([id,label])=>(
-          <button key={id} onClick={()=>setTab(id)} style={{background:tab===id?C.navy:"transparent",color:tab===id?C.white:C.muted,border:"none",borderRadius:8,padding:"9px 16px",cursor:"pointer",fontSize:13,fontFamily:"sans-serif",fontWeight:600}}>{label}</button>
-        ))}
-      </div>
-      {tab==="inquiries"&&MOCK_INQ.map(i=>(
-        <div key={i.id} style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:12,padding:"18px 22px",marginBottom:12}}>
-          <div style={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8,marginBottom:8}}>
-            <div style={{display:"flex",gap:10,alignItems:"center"}}><span style={{fontSize:15,fontWeight:700,color:C.navy}}>{i.name}</span><span style={{fontSize:12,color:C.muted,fontFamily:"sans-serif"}}>{i.id}</span></div>
-            <div style={{display:"flex",gap:8,alignItems:"center"}}><span style={{background:SC[i.status],color:ST[i.status],fontSize:11,fontWeight:700,padding:"3px 11px",borderRadius:20,fontFamily:"sans-serif"}}>{i.status}</span><span style={{fontSize:12,color:C.muted,fontFamily:"sans-serif"}}>{i.time}</span></div>
+
+          {/* Tabs */}
+          <div style={{ display:"flex", gap:8, marginBottom:24, background:C.off, borderRadius:10, padding:6, width:"fit-content", flexWrap:"wrap" }}>
+            {[
+              ["inquiries",    "Student Enquiries"],
+              ["board",        "Board Enquiries"],
+              ["applications", "Tutor Applications"],
+            ].map(([id, label]) => (
+              <button key={id} onClick={() => setTab(id)}
+                style={{ background:tab===id ? C.navy : "transparent", color:tab===id ? C.white : C.muted, border:"none", borderRadius:8, padding:"9px 16px", cursor:"pointer", fontSize:13, fontFamily:"sans-serif", fontWeight:600 }}>
+                {label}
+              </button>
+            ))}
           </div>
-          <div style={{display:"flex",gap:18,flexWrap:"wrap",fontFamily:"sans-serif",fontSize:13,color:C.muted}}>
-            <span>📚 {i.subs}</span><span>🎓 {i.cls}</span><span>📍 {i.area}</span><span>📞 {i.ph}</span>
+
+          {/* ── Enquiries Tab ── */}
+          {tab === "inquiries" && (
+            <div>
+              {enquiries.length === 0 ? (
+                <div style={{ textAlign:"center", padding:"40px", color:C.muted, fontFamily:"sans-serif", background:C.white, borderRadius:12, border:"1px solid " + C.border }}>
+                  No enquiries yet. When students submit the form they will appear here.
+                </div>
+              ) : enquiries.map(i => {
+                const sc = getStatus(i.status);
+                return (
+                  <div key={i.id} style={cardStyle}>
+                    <div style={{ display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:8, marginBottom:10 }}>
+                      <div style={{ display:"flex", gap:10, alignItems:"center" }}>
+                        <span style={nameStyle}>{i.student_name || "Unknown"}</span>
+                        <span style={idStyle}>1T1-{i.id.slice(-6).toUpperCase()}</span>
+                      </div>
+                      <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                        <span style={{ background:sc.bg, color:sc.text, fontSize:11, fontWeight:700, padding:"3px 11px", borderRadius:20, fontFamily:"sans-serif" }}>
+                          {i.status || "new"}
+                        </span>
+                        <span style={{ fontSize:12, color:C.muted, fontFamily:"sans-serif" }}>{i.created_at}</span>
+                      </div>
+                    </div>
+                    <div style={metaStyle}>
+                      <span>👤 {i.parent_name || "—"}</span>
+                      <span>📞 {i.phone}</span>
+                      <span>🎓 {i.class_selected || "—"}</span>
+                      <span>📚 {i.board || "—"}</span>
+                      <span>📖 {i.subjects || "—"}</span>
+                      <span>📍 {i.area || "—"}</span>
+                      <span>🗂 {i.course_type || "—"}</span>
+                    </div>
+                    {i.message && (
+                      <div style={{ marginTop:8, fontFamily:"sans-serif", fontSize:13, color:C.muted, background:C.off, borderRadius:8, padding:"8px 12px" }}>
+                        💬 {i.message}
+                      </div>
+                    )}
+                    <div style={{ marginTop:10, display:"flex", gap:8 }}>
+                      <a href={"tel:" + i.phone}
+                        style={{ background:C.navy, color:C.white, textDecoration:"none", borderRadius:7, padding:"7px 16px", fontSize:12, fontWeight:700, fontFamily:"sans-serif" }}>
+                        📞 Call Now
+                      </a>
+                      <a href={"https://wa.me/91" + i.phone.replace(/\D/g,"")}
+                        target="_blank" rel="noreferrer"
+                        style={{ background:"#25D366", color:C.white, textDecoration:"none", borderRadius:7, padding:"7px 16px", fontSize:12, fontWeight:700, fontFamily:"sans-serif" }}>
+                        💬 WhatsApp
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* ── Board Enquiries Tab ── */}
+          {tab === "board" && (
+            <div>
+              {boardEnqs.length === 0 ? (
+                <div style={{ textAlign:"center", padding:"40px", color:C.muted, fontFamily:"sans-serif", background:C.white, borderRadius:12, border:"1px solid " + C.border }}>
+                  No board widget enquiries yet.
+                </div>
+              ) : boardEnqs.map(i => (
+                <div key={i.id} style={cardStyle}>
+                  <div style={{ display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:8, marginBottom:10 }}>
+                    <div style={{ display:"flex", gap:10, alignItems:"center" }}>
+                      <span style={nameStyle}>{i.name || "Unknown"}</span>
+                      <span style={idStyle}>1T1-B-{i.id.slice(-6).toUpperCase()}</span>
+                    </div>
+                    <span style={{ fontSize:12, color:C.muted, fontFamily:"sans-serif" }}>{i.created_at}</span>
+                  </div>
+                  <div style={metaStyle}>
+                    <span>📞 {i.phone}</span>
+                    <span>📍 {i.area || "—"}</span>
+                    <span>📋 {i.board_label || "—"}</span>
+                    <span>🎓 {i.class_selected ? "Class " + i.class_selected : "—"}</span>
+                  </div>
+                  {i.topics_detail && (
+                    <div style={{ marginTop:8, fontFamily:"sans-serif", fontSize:12.5, color:C.muted, background:C.off, borderRadius:8, padding:"8px 12px" }}>
+                      📚 {i.topics_detail}
+                    </div>
+                  )}
+                  <div style={{ marginTop:10, display:"flex", gap:8 }}>
+                    <a href={"tel:" + i.phone}
+                      style={{ background:C.navy, color:C.white, textDecoration:"none", borderRadius:7, padding:"7px 16px", fontSize:12, fontWeight:700, fontFamily:"sans-serif" }}>
+                      📞 Call Now
+                    </a>
+                    <a href={"https://wa.me/91" + i.phone.replace(/\D/g,"")}
+                      target="_blank" rel="noreferrer"
+                      style={{ background:"#25D366", color:C.white, textDecoration:"none", borderRadius:7, padding:"7px 16px", fontSize:12, fontWeight:700, fontFamily:"sans-serif" }}>
+                      💬 WhatsApp
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ── Applications Tab ── */}
+          {tab === "applications" && (
+            <div>
+              {applications.length === 0 ? (
+                <div style={{ textAlign:"center", padding:"40px", color:C.muted, fontFamily:"sans-serif", background:C.white, borderRadius:12, border:"1px solid " + C.border }}>
+                  No tutor applications yet.
+                </div>
+              ) : applications.map(a => {
+                const sc = getStatus(a.status);
+                return (
+                  <div key={a.id} style={cardStyle}>
+                    <div style={{ display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:8, marginBottom:10 }}>
+                      <div style={{ display:"flex", gap:10, alignItems:"center" }}>
+                        <span style={nameStyle}>{a.name}</span>
+                        <span style={idStyle}>1T1-T-{a.id.slice(-6).toUpperCase()}</span>
+                      </div>
+                      <span style={{ background:sc.bg, color:sc.text, fontSize:11, fontWeight:700, padding:"3px 11px", borderRadius:20, fontFamily:"sans-serif" }}>
+                        {a.status || "pending"}
+                      </span>
+                    </div>
+                    <div style={metaStyle}>
+                      <span>📞 {a.phone}</span>
+                      <span>🎓 {a.qualification || "—"}</span>
+                      <span>📚 {a.subjects || "—"}</span>
+                      <span>📋 {a.classes || "—"}</span>
+                      <span>📍 {a.area || "—"}</span>
+                      <span>⏳ {a.experience_years || "—"} yrs</span>
+                    </div>
+                    {a.about && (
+                      <div style={{ marginTop:8, fontFamily:"sans-serif", fontSize:12.5, color:C.muted, background:C.off, borderRadius:8, padding:"8px 12px" }}>
+                        {a.about}
+                      </div>
+                    )}
+                    <div style={{ marginTop:10, display:"flex", gap:8 }}>
+                      <a href={"tel:" + a.phone}
+                        style={{ background:C.navy, color:C.white, textDecoration:"none", borderRadius:7, padding:"7px 16px", fontSize:12, fontWeight:700, fontFamily:"sans-serif" }}>
+                        📞 Call Now
+                      </a>
+                      <a href={"https://wa.me/91" + a.phone.replace(/\D/g,"")}
+                        target="_blank" rel="noreferrer"
+                        style={{ background:"#25D366", color:C.white, textDecoration:"none", borderRadius:7, padding:"7px 16px", fontSize:12, fontWeight:700, fontFamily:"sans-serif" }}>
+                        💬 WhatsApp
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div style={{ marginTop:32, background:C.goldPale, border:"1px solid " + C.gold, borderRadius:12, padding:"16px 20px", display:"flex", alignItems:"center", gap:14, flexWrap:"wrap" }}>
+            <span style={{ fontFamily:"sans-serif", fontSize:13, color:"#7A5C00" }}>View full database, export data, and manage records:</span>
+            <a href="https://console.firebase.google.com" target="_blank" rel="noreferrer"
+              style={{ background:C.navy, color:C.white, textDecoration:"none", borderRadius:8, padding:"9px 20px", fontFamily:"sans-serif", fontSize:13, fontWeight:700 }}>
+              Open Firebase Console →
+            </a>
           </div>
         </div>
-      ))}
-      {tab==="applications"&&MOCK_APP.map(a=>(
-        <div key={a.id} style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:12,padding:"18px 22px",marginBottom:12}}>
-          <div style={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8,marginBottom:8}}>
-            <div style={{display:"flex",gap:10,alignItems:"center"}}><span style={{fontSize:15,fontWeight:700,color:C.navy}}>{a.name}</span><span style={{fontSize:12,color:C.muted,fontFamily:"sans-serif"}}>{a.id}</span></div>
-            <span style={{background:SC[a.status],color:ST[a.status],fontSize:11,fontWeight:700,padding:"3px 11px",borderRadius:20,fontFamily:"sans-serif"}}>{a.status}</span>
-          </div>
-          <div style={{display:"flex",gap:18,flexWrap:"wrap",fontFamily:"sans-serif",fontSize:13,color:C.muted}}>
-            <span>🎓 {a.qual}</span><span>📚 {a.subs}</span><span>📋 {a.cls}</span><span>📍 {a.area}</span><span>⏳ {a.exp} yrs</span>
-          </div>
-        </div>
-      ))}
+      )}
     </div>
   );
 }
