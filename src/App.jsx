@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { submitEnquiry, submitTutorApplication } from "./submitHandlers";
+import { submitEnquiry, submitTutorApplication, submitBoardEnquiry } from "./submitHandlers";
 
 /* ─── Design Tokens ─────────────────────────────────────────────────── */
 const C = {
@@ -530,10 +530,27 @@ function BoardEnquiryWidget({ compact = false }) {
                     </div>
                     <div style={{display:"flex",gap:10}}>
                       <button onClick={()=>setStep(2)} style={{background:"none",border:`1.5px solid ${C.border}`,borderRadius:8,padding:"12px 22px",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"sans-serif",color:C.muted}}>← Back</button>
-                      <button onClick={()=>{if(!form.name||!form.phone){alert("Please enter name and phone.");return;}setDone(true);}}
-                        style={{flex:1,background:C.navy,color:C.white,border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"sans-serif"}}>
-                        Submit Enquiry — Counsellor Will Call Within 24 Hours
-                      </button>
+                      <button onClick={async () => {
+                          if(!form.name||!form.phone){alert("Please enter name and phone.");return;}
+                          try {
+                            const result = await submitBoardEnquiry({
+                              name: form.name,
+                              phone: form.phone,
+                              area: form.area,
+                              boardKey: active,
+                              boardLabel: cfg.label,
+                              selClass: selClass,
+                              selectedSubjects: selSubjects
+                            });
+                            if (result.success) setDone(true);
+                            else alert('Submission failed. Check console.');
+                          } catch(e) {
+                            console.error(e);
+                            alert('Network error. Check console.');
+                          }
+                        }} style={{flex:1,background:C.gold,color:C.navyDeep,borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"sans-serif"}}>
+                           Submit Enquiry — Counsellor Will Call Within 24 Hours
+                         </button>
                     </div>
                     <p style={{textAlign:"center",fontSize:12,color:C.muted,fontFamily:"sans-serif",marginTop:10}}>💡 No fees during counselling. Pricing is personalised on the call.</p>
                   </>
@@ -1335,7 +1352,7 @@ function Admin() {
   const [applications, setApps]     = useState([]);
   const [boardEnqs, setBoardEnqs]   = useState([]);
   const [loadingData, setLoadingData] = useState(false);
-  const ADMIN_PASSWORD = "Momentum@2025";
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "Momentum@2025";
 
   const tryUnlock = async () => {
     if (pwd === ADMIN_PASSWORD) {
@@ -1538,11 +1555,11 @@ function Admin() {
                     </div>
                   )}
                   <div style={{ marginTop:10, display:"flex", gap:8 }}>
-                    <a href={"tel:" + i.phone}
+                    <a href={"tel:" + (i.phone || "")}
                       style={{ background:C.navy, color:C.white, textDecoration:"none", borderRadius:7, padding:"7px 16px", fontSize:12, fontWeight:700, fontFamily:"sans-serif" }}>
                       📞 Call Now
                     </a>
-                    <a href={"https://wa.me/91" + i.phone.replace(/\D/g,"")}
+                    <a href={"https://wa.me/91" + (i.phone || "").replace(/\D/g,"")}
                       target="_blank" rel="noreferrer"
                       style={{ background:"#25D366", color:C.white, textDecoration:"none", borderRadius:7, padding:"7px 16px", fontSize:12, fontWeight:700, fontFamily:"sans-serif" }}>
                       💬 WhatsApp
@@ -1587,15 +1604,15 @@ function Admin() {
                       </div>
                     )}
                     <div style={{ marginTop:10, display:"flex", gap:8 }}>
-                      <a href={"tel:" + a.phone}
-                        style={{ background:C.navy, color:C.white, textDecoration:"none", borderRadius:7, padding:"7px 16px", fontSize:12, fontWeight:700, fontFamily:"sans-serif" }}>
-                        📞 Call Now
-                      </a>
-                      <a href={"https://wa.me/91" + a.phone.replace(/\D/g,"")}
-                        target="_blank" rel="noreferrer"
-                        style={{ background:"#25D366", color:C.white, textDecoration:"none", borderRadius:7, padding:"7px 16px", fontSize:12, fontWeight:700, fontFamily:"sans-serif" }}>
-                        💬 WhatsApp
-                      </a>
+                    <a href={"tel:" + (a.phone || "")}
+                      style={{ background:C.navy, color:C.white, textDecoration:"none", borderRadius:7, padding:"7px 16px", fontSize:12, fontWeight:700, fontFamily:"sans-serif" }}>
+                      📞 Call Now
+                    </a>
+                    <a href={"https://wa.me/91" + (a.phone || "").replace(/\D/g,"")}
+                      target="_blank" rel="noreferrer"
+                      style={{ background:"#25D366", color:C.white, textDecoration:"none", borderRadius:7, padding:"7px 16px", fontSize:12, fontWeight:700, fontFamily:"sans-serif" }}>
+                      💬 WhatsApp
+                    </a>
                     </div>
                   </div>
                 );
