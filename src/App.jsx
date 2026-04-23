@@ -153,7 +153,7 @@ const COURSES = [
 ];
 
 const MOCK_INQ = [
-  { id:"1T1-291847", name:"Rohan Mehta",   cls:"Class 11 CBSE",       subs:"Physics, Maths",   area:"Dharampeth",     ph:"98765 43210", status:"new",       time:"2 hrs ago"  },
+  { id:"1T1-291847", name:"Rohan Mehta",   cls:"Class 11 CBSE",       subs:"Physics, Maths",   area:"Dharampeth",     ph:"8010373753", status:"new",       time:"2 hrs ago"  },
   { id:"1T1-391021", name:"Prachi Desai",  cls:"NEET",                 subs:"Biology, Chem",    area:"Ramdaspeth",     ph:"91234 56789", status:"contacted", time:"5 hrs ago"  },
   { id:"1T1-190234", name:"Ananya Singh",  cls:"Class 9 State Board",  subs:"Science, Maths",   area:"Wardhaman Nagar",ph:"87654 32109", status:"new",       time:"1 day ago"  },
   { id:"1T1-882910", name:"Dev Patel",     cls:"JEE Mains",            subs:"PCM",              area:"Civil Lines",    ph:"99887 76655", status:"assigned",  time:"2 days ago" },
@@ -175,27 +175,84 @@ const INP   = {border:`1.5px solid ${C.border}`,borderRadius:8,padding:"10px 14p
 const LBL   = {fontSize:11,fontWeight:700,color:C.navy,fontFamily:"sans-serif",letterSpacing:".06em",textTransform:"uppercase",display:"block",marginBottom:5};
 
 /* ─── Logo ──────────────────────────────────────────────────────────── */
-function Logo({ onClick, size="md" }) {
-  const xl=size==="xl", lg=size==="lg";
-  const bp=xl?40:lg?26:17, cp=xl?28:lg?18:12, np=xl?34:lg?22:16, tp=xl?13:lg?10:8, lp=xl?11:lg?9:7;
-  const gap=xl?14:lg?10:7, pad=xl?"7px 18px":lg?"5px 14px":"3px 9px", rad=xl?12:lg?9:7;
+function Logo({ onClick, size="md", animate=false }) {
+  const h = size==="xl" ? 190 : size==="lg" ? 68 : 52;
+  const isHero = size === "xl";
   return (
-    <div onClick={onClick} style={{cursor:"pointer",userSelect:"none"}}>
-      <div style={{display:"flex",alignItems:"center",gap}}>
-        <div style={{background:`linear-gradient(135deg,${C.goldLight},${C.gold})`,borderRadius:rad,padding:pad,display:"flex",alignItems:"center",gap:xl?4:lg?3:2,boxShadow:"0 3px 12px rgba(212,160,23,.5)",flexShrink:0}}>
-          <span style={{color:C.navyDeep,fontSize:bp,fontWeight:900,fontFamily:"sans-serif",letterSpacing:"-0.04em",lineHeight:1}}>1</span>
-          <span style={{color:C.navyDeep,fontSize:cp,fontWeight:400,fontFamily:"sans-serif"}}>:</span>
-          <span style={{color:C.navyDeep,fontSize:bp,fontWeight:900,fontFamily:"sans-serif",letterSpacing:"-0.04em",lineHeight:1}}>1</span>
-        </div>
-        <div>
-          <div style={{color:C.white,fontSize:np,fontWeight:700,fontFamily:"'Playfair Display',Georgia,serif",lineHeight:1.1}}>Home Tutors</div>
-          <div style={{color:C.goldLight,fontSize:tp,letterSpacing:".16em",textTransform:"uppercase",fontFamily:"sans-serif",fontStyle:"italic",marginTop:1}}>Everything at Your Doorstep</div>
-        </div>
+    <>
+      <style>{`
+        @keyframes logoEntrance {
+          0%  { opacity:0; transform:scale(.82) translateY(-18px); filter:blur(6px); }
+          60% { opacity:1; transform:scale(1.04) translateY(2px); filter:blur(0); }
+          100%{ opacity:1; transform:scale(1) translateY(0); filter:blur(0); }
+        }
+        @keyframes logoGlow {
+          0%,100% { box-shadow: 0 0 0 0 rgba(212,160,23,0), 0 0 30px 0 rgba(212,160,23,0); }
+          50%      { box-shadow: 0 0 0 8px rgba(212,160,23,.12), 0 0 50px 12px rgba(212,160,23,.18); }
+        }
+        @keyframes shimmerSweep {
+          0%   { background-position: -300% center; }
+          100% { background-position: 300% center; }
+        }
+        @keyframes ringPulse {
+          0%,100% { transform:translate(-50%,-50%) scale(1);   opacity:.35; }
+          50%      { transform:translate(-50%,-50%) scale(1.08); opacity:.08; }
+        }
+        .logo-hero-wrap {
+          position: relative;
+          display: inline-block;
+          animation: logoEntrance .9s cubic-bezier(.22,1,.36,1) both;
+        }
+        .logo-hero-wrap::before {
+          content:'';
+          position:absolute; inset:-14px; border-radius:50%;
+          background: radial-gradient(ellipse, rgba(212,160,23,.22) 0%, transparent 72%);
+          animation: logoGlow 3s ease-in-out infinite;
+          pointer-events:none; z-index:0;
+        }
+        .logo-hero-img {
+          position:relative; z-index:1;
+          border-radius:50%;
+          filter: drop-shadow(0 8px 32px rgba(212,160,23,.35));
+        }
+        .logo-shimmer-ring {
+          position:absolute; inset:-20px; border-radius:50%;
+          border: 1.5px solid transparent;
+          background: linear-gradient(#060e2a,#060e2a) padding-box,
+                      linear-gradient(135deg, transparent 30%, rgba(212,160,23,.7) 50%, transparent 70%) border-box;
+          background-size: 300% 300%;
+          animation: shimmerSweep 3s linear infinite;
+          pointer-events:none; z-index:0;
+        }
+        .logo-nav-img {
+          transition: filter .3s, transform .3s;
+        }
+        .logo-nav-img:hover {
+          filter: drop-shadow(0 0 8px rgba(212,160,23,.5));
+          transform: scale(1.05);
+        }
+      `}</style>
+      <div onClick={onClick} style={{ cursor: onClick ? "pointer" : "default", userSelect:"none" }}>
+        {isHero ? (
+          <div className="logo-hero-wrap">
+            <div className="logo-shimmer-ring"/>
+            <img
+              src="/logo.jpg"
+              alt="1 to 1 Home Tutors Nagpur"
+              className="logo-hero-img"
+              style={{ height: h, width: "auto", display: "block" }}
+            />
+          </div>
+        ) : (
+          <img
+            src="/logo.jpg"
+            alt="1 to 1 Home Tutors Nagpur"
+            className="logo-nav-img"
+            style={{ height: h, width: "auto", display: "block" }}
+          />
+        )}
       </div>
-      <div style={{marginTop:3,paddingLeft:2}}>
-        <span style={{color:"#475569",fontSize:lp,fontFamily:"sans-serif",letterSpacing:".1em",textTransform:"uppercase"}}>Backed by Momentum Nagpur · 22 Years of Excellence</span>
-      </div>
-    </div>
+    </>
   );
 }
 
@@ -246,8 +303,24 @@ function Nav({ page, setPage }) {
         {/* ── Main bar ── */}
         <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1.25rem", display:"flex", alignItems:"center", justifyContent:"space-between", height:66 }}>
 
-          {/* Logo */}
-          <Logo onClick={() => navigate("home")} />
+          {/* Premium text brand mark — no image */}
+          <div onClick={() => navigate("home")} style={{ cursor:"pointer", userSelect:"none", display:"flex", alignItems:"center", gap:0 }}>
+            <div style={{ display:"flex", flexDirection:"column", justifyContent:"center", position:"relative" }}>
+              {/* Top decorative line */}
+              <div style={{ height:1, background:`linear-gradient(to right,${C.gold},transparent)`, marginBottom:3, width:120 }}/>
+              {/* Brand name */}
+              <div style={{ display:"flex", alignItems:"baseline", gap:3 }}>
+                <span style={{ color:C.gold, fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',Georgia,serif", letterSpacing:"-.01em", lineHeight:1 }}>1</span>
+                <span style={{ color:`${C.gold}80`, fontSize:14, fontWeight:400, fontFamily:"'Playfair Display',Georgia,serif", lineHeight:1 }}>:</span>
+                <span style={{ color:C.gold, fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',Georgia,serif", letterSpacing:"-.01em", lineHeight:1 }}>1</span>
+                <span style={{ color:"#94A3B8", fontSize:12.5, fontWeight:600, fontFamily:"sans-serif", letterSpacing:".02em", marginLeft:5, lineHeight:1 }}>Home Tutors</span>
+              </div>
+              {/* Tagline */}
+              <div style={{ color:"#475569", fontSize:7, letterSpacing:".22em", textTransform:"uppercase", fontFamily:"sans-serif", marginTop:2, lineHeight:1 }}>Backed by Momentum Nagpur</div>
+              {/* Bottom decorative line */}
+              <div style={{ height:1, background:`linear-gradient(to right,${C.gold}55,transparent)`, marginTop:3, width:80 }}/>
+            </div>
+          </div>
 
           {/* Desktop links */}
           <div className="nav-desktop-links" style={{ display:"flex", gap:3 }}>
@@ -275,11 +348,23 @@ function Nav({ page, setPage }) {
         <div className="nav-contact-bar" style={{ background:`${C.gold}15`, borderTop:`1px solid ${C.gold}28`, padding:"5px 1.25rem", display:"flex", alignItems:"center", justifyContent:"center", gap:8, fontFamily:"sans-serif", fontSize:12, flexWrap:"wrap" }}>
           <span style={{ color:C.gold }}>📞</span>
           <span style={{ color:"#94A3B8" }}>Call/WhatsApp:</span>
-          <strong style={{ color:C.goldLight }}>+91 98765 43210</strong>
+          <strong style={{ color:C.goldLight }}>+91 8010373753</strong>
           <span className="hide-mobile" style={{ color:"#334155", margin:"0 4px" }}>|</span>
-          <span className="hide-mobile" style={{ color:"#94A3B8" }}>✉ info@1to1hometutors.in</span>
+          <span className="hide-mobile" style={{ color:"#94A3B8" }}>✉ 1to1hometutornagpur@gmail.com</span>
           <span className="hide-mobile" style={{ color:"#334155", margin:"0 4px" }}>|</span>
           <span className="hide-mobile" style={{ color:"#94A3B8" }}>🕐 Mon–Sat 9AM–7PM</span>
+        </div>
+
+        {/* ── Area ticker strip ── */}
+        <div style={{ background:C.navy, padding:"6px 0", overflow:"hidden", borderBottom:`1px solid ${C.gold}22` }}>
+          <div style={{ display:"flex", gap:0, animation:"navTicker 28s linear infinite", whiteSpace:"nowrap" }}>
+            {[...AREAS,...AREAS].map((a,i)=>(
+              <span key={i} style={{ color:"#94A3B8", fontFamily:"sans-serif", fontSize:11, padding:"0 14px", flexShrink:0 }}>
+                <span style={{ color:C.gold, marginRight:5 }}>📍</span>{a}
+              </span>
+            ))}
+          </div>
+          <style>{`@keyframes navTicker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}`}</style>
         </div>
 
         {/* ── Mobile dropdown menu ── */}
@@ -303,11 +388,11 @@ function Nav({ page, setPage }) {
 
             {/* Contact info inside mobile menu */}
             <div style={{ margin:"10px 20px 0", padding:"12px 16px", background:`${C.white}06`, borderRadius:10, border:`1px solid ${C.gold}22` }}>
-              <div style={{ color:C.gold, fontSize:13, fontWeight:700, fontFamily:"sans-serif", marginBottom:6 }}>📞 +91 98765 43210</div>
-              <div style={{ color:"#94A3B8", fontSize:12, fontFamily:"sans-serif", marginBottom:3 }}>✉ info@1to1hometutors.in</div>
+              <div style={{ color:C.gold, fontSize:13, fontWeight:700, fontFamily:"sans-serif", marginBottom:6 }}>📞 +91 8010373753</div>
+              <div style={{ color:"#94A3B8", fontSize:12, fontFamily:"sans-serif", marginBottom:3 }}>✉ 1to1hometutornagpur@gmail.com</div>
               <div style={{ color:"#94A3B8", fontSize:12, fontFamily:"sans-serif" }}>🕐 Mon–Sat, 9 AM – 7 PM</div>
               <button
-                onClick={() => { window.open("https://wa.me/919876543210"); setMenuOpen(false); }}
+                onClick={() => { window.open("https://wa.me/918010373753"); setMenuOpen(false); }}
                 style={{ marginTop:10, width:"100%", background:"#25D366", color:C.white, border:"none", borderRadius:8, padding:"10px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"sans-serif" }}>
                 💬 WhatsApp Us Now
               </button>
@@ -678,46 +763,354 @@ function Counter({ target, suffix="" }) {
   return <span ref={ref}>{val.toLocaleString()}{suffix}</span>;
 }
 
+/* ─── How It Works — cursor-interactive premium timeline ──────────────── */
+function HowItWorks({ setPage }) {
+  const STEPS = [
+    { n:"01", icon:"📋", t:"Submit Enquiry",       d:"Fill our quick form — class, board, subject & Nagpur area. Takes under 2 minutes.",       color:"#1E3A8A" },
+    { n:"02", icon:"📞", t:"Counsellor Calls",      d:"Our academic counsellor calls within 24 hours to understand your child's exact needs.",    color:"#14532D" },
+    { n:"03", icon:"📍", t:"Location Verified",     d:"We confirm your exact area in Nagpur and match tutor availability near your home.",        color:"#7C2D12" },
+    { n:"04", icon:"🎓", t:"Tutor Matched",          d:"2–3 vetted tutors near you are shortlisted — you choose who you're comfortable with.",     color:"#581C87" },
+    { n:"05", icon:"🏠", t:"Sessions Begin",         d:"One-to-one classes at your home, on your schedule, at your pace. Zero commute.",           color:"#0C4A6E" },
+  ];
+
+  const [active, setActive]   = useState(null);
+  const [cursorPos, setCursor] = useState({ x: 0, y: 0 });
+  const [cursorVis, setCursorVis] = useState(false);
+  const containerRef = useRef(null);
+
+  const handleMouseMove = (e) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setCursor({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setCursorVis(true)}
+      onMouseLeave={() => { setCursorVis(false); setActive(null); }}
+      style={{ background:"#06091A", padding:"80px 1.5rem", position:"relative", overflow:"hidden", cursor:"none" }}
+    >
+      <style>{`
+        @keyframes cursorPulse {
+          0%,100% { transform:translate(-50%,-50%) scale(1); opacity:.9; }
+          50%      { transform:translate(-50%,-50%) scale(1.18); opacity:.6; }
+        }
+        @keyframes stepReveal {
+          from { opacity:0; transform:translateY(32px); }
+          to   { opacity:1; transform:translateY(0); }
+        }
+        @keyframes lineGrow {
+          from { width:0; }
+          to   { width:100%; }
+        }
+        @keyframes floatOrb {
+          0%,100% { transform:translateY(0) scale(1); }
+          50%      { transform:translateY(-18px) scale(1.05); }
+        }
+        .hiw-step-card {
+          position:relative; border-radius:20px;
+          padding:32px 24px; text-align:center;
+          transition: transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s, border-color .25s;
+          cursor:none;
+          animation: stepReveal .7s cubic-bezier(.22,1,.36,1) both;
+        }
+        .hiw-step-card:hover {
+          transform: translateY(-10px) scale(1.025);
+        }
+        .hiw-step-num {
+          transition: all .3s;
+        }
+        .hiw-step-card:hover .hiw-step-num {
+          transform: scale(1.12);
+          box-shadow: 0 0 0 6px rgba(212,160,23,.2), 0 0 24px 4px rgba(212,160,23,.3);
+        }
+        .hiw-cta-btn {
+          transition: transform .2s, box-shadow .2s;
+        }
+        .hiw-cta-btn:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 10px 36px rgba(212,160,23,.5) !important;
+        }
+      `}</style>
+
+      {/* Custom cursor */}
+      {cursorVis && (
+        <div style={{
+          position:"absolute", left:cursorPos.x, top:cursorPos.y,
+          width:40, height:40, borderRadius:"50%", pointerEvents:"none", zIndex:50,
+          background:`radial-gradient(circle, rgba(212,160,23,.7) 0%, rgba(212,160,23,.0) 70%)`,
+          transform:"translate(-50%,-50%)",
+          animation:"cursorPulse 2s ease-in-out infinite",
+          transition:"left .08s ease-out, top .08s ease-out",
+        }}/>
+      )}
+      {cursorVis && (
+        <div style={{
+          position:"absolute", left:cursorPos.x, top:cursorPos.y,
+          width:10, height:10, borderRadius:"50%", pointerEvents:"none", zIndex:51,
+          background:C.gold, transform:"translate(-50%,-50%)",
+          boxShadow:`0 0 10px ${C.gold}`,
+          transition:"left .04s ease-out, top .04s ease-out",
+        }}/>
+      )}
+
+      {/* Background floating orbs */}
+      <div style={{position:"absolute",top:"10%",left:"5%",width:220,height:220,borderRadius:"50%",background:"radial-gradient(circle,rgba(212,160,23,.05) 0%,transparent 70%)",animation:"floatOrb 7s ease-in-out infinite",pointerEvents:"none"}}/>
+      <div style={{position:"absolute",bottom:"12%",right:"6%",width:280,height:280,borderRadius:"50%",background:"radial-gradient(circle,rgba(11,31,78,.6) 0%,transparent 70%)",animation:"floatOrb 9s ease-in-out infinite .5s",pointerEvents:"none"}}/>
+      <div style={{position:"absolute",top:"50%",right:"18%",width:140,height:140,borderRadius:"50%",background:"radial-gradient(circle,rgba(212,160,23,.04) 0%,transparent 70%)",animation:"floatOrb 6s ease-in-out infinite 1s",pointerEvents:"none"}}/>
+
+      <div style={{ maxWidth:1060, margin:"0 auto", position:"relative", zIndex:1 }}>
+
+        {/* Section header */}
+        <div style={{ textAlign:"center", marginBottom:60 }}>
+          <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(212,160,23,.1)", border:"1px solid rgba(212,160,23,.25)", borderRadius:30, padding:"6px 18px", marginBottom:16 }}>
+            <span style={{ color:C.gold, fontSize:10, fontWeight:700, letterSpacing:".2em", textTransform:"uppercase", fontFamily:"sans-serif" }}>Simple Process</span>
+          </div>
+          <h2 style={{ color:C.white, fontSize:"clamp(1.6rem,3.5vw,2.4rem)", fontWeight:700, fontFamily:"'Playfair Display',Georgia,serif", margin:"0 0 8px" }}>How It Works</h2>
+          <div style={{ width:48, height:3, background:`linear-gradient(to right,${C.gold},${C.goldLight})`, borderRadius:2, margin:"10px auto 16px" }}/>
+          <p style={{ color:"#4A6080", fontFamily:"sans-serif", fontSize:14, maxWidth:480, margin:"0 auto" }}>From enquiry to your first home session — 5 effortless steps. Hover each step to explore.</p>
+        </div>
+
+        {/* Desktop: horizontal timeline */}
+        <div style={{ display:"none" }} className="hiw-desktop-row">
+        </div>
+
+        {/* Steps grid */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))", gap:16, marginBottom:52 }}>
+          {STEPS.map((s, i) => {
+            const isActive = active === i;
+            return (
+              <div
+                key={i}
+                className="hiw-step-card"
+                onMouseEnter={() => setActive(i)}
+                style={{
+                  background: isActive
+                    ? `linear-gradient(145deg,${s.color}cc,${s.color}88)`
+                    : "rgba(255,255,255,.04)",
+                  border: isActive
+                    ? `1.5px solid rgba(212,160,23,.55)`
+                    : "1.5px solid rgba(255,255,255,.07)",
+                  boxShadow: isActive
+                    ? `0 20px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(212,160,23,.2), inset 0 1px 0 rgba(255,255,255,.1)`
+                    : "0 4px 20px rgba(0,0,0,.3)",
+                  animationDelay: `${i * .12}s`,
+                }}
+              >
+                {/* Connector line — only after each step except last, desktop feel */}
+                {i < STEPS.length - 1 && (
+                  <div style={{ position:"absolute", top:44, right:-8, width:16, height:2, background:isActive ? C.gold : "rgba(212,160,23,.2)", transition:"background .3s", zIndex:2, display:"none" }} className="hiw-connector"/>
+                )}
+
+                {/* Step number circle */}
+                <div className="hiw-step-num" style={{
+                  width:52, height:52, borderRadius:"50%", margin:"0 auto 14px",
+                  background: isActive
+                    ? `linear-gradient(135deg,${C.gold},${C.goldLight})`
+                    : `rgba(212,160,23,.12)`,
+                  border: isActive ? "none" : `1.5px solid rgba(212,160,23,.25)`,
+                  display:"flex", alignItems:"center", justifyContent:"center",
+                  fontFamily:"'Playfair Display',Georgia,serif", fontWeight:700,
+                  fontSize:13, color: isActive ? C.navyDeep : C.gold,
+                }}>
+                  {s.n}
+                </div>
+
+                {/* Icon */}
+                <div style={{ fontSize:26, marginBottom:10, filter: isActive ? "drop-shadow(0 0 8px rgba(212,160,23,.5))" : "none", transition:"filter .3s" }}>
+                  {s.icon}
+                </div>
+
+                {/* Title */}
+                <div style={{
+                  fontSize:14.5, fontWeight:700,
+                  color: isActive ? C.white : "#8899AA",
+                  fontFamily:"'Playfair Display',Georgia,serif",
+                  marginBottom:10, transition:"color .25s",
+                }}>
+                  {s.t}
+                </div>
+
+                {/* Description */}
+                <div style={{
+                  fontSize:12, color: isActive ? "rgba(255,255,255,.78)" : "rgba(255,255,255,.28)",
+                  fontFamily:"sans-serif", lineHeight:1.7, transition:"color .25s",
+                }}>
+                  {s.d}
+                </div>
+
+                {/* Active glow bottom bar */}
+                {isActive && (
+                  <div style={{
+                    position:"absolute", bottom:0, left:"50%", transform:"translateX(-50%)",
+                    width:"60%", height:2,
+                    background:`linear-gradient(to right,transparent,${C.gold},transparent)`,
+                    borderRadius:2,
+                  }}/>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* CTA */}
+        <div style={{ textAlign:"center" }}>
+          <button
+            onClick={() => setPage("inquiry")}
+            className="hiw-cta-btn"
+            style={{
+              background:`linear-gradient(135deg,${C.gold},${C.goldLight})`,
+              color:C.navyDeep, border:"none", borderRadius:12,
+              padding:"16px 44px", fontSize:15, fontWeight:700,
+              cursor:"none", fontFamily:"sans-serif",
+              boxShadow:"0 6px 28px rgba(212,160,23,.4)",
+            }}
+          >
+            📞 Book Free Counselling Session →
+          </button>
+          <p style={{ color:"#2A3A50", fontFamily:"sans-serif", fontSize:12, marginTop:12 }}>Free · No commitment · Response within 24 hours</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Home ──────────────────────────────────────────────────────────── */
 function Home({ setPage }) {
   return (
     <div>
       {/* Hero */}
-      <div style={{background:`linear-gradient(135deg,${C.navyDeep} 0%,${C.navy} 55%,#1C3A7A 100%)`,padding:"80px 1.5rem 68px",textAlign:"center",position:"relative",overflow:"hidden"}}>
-        {/* Decorative rings */}
-        <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:700,height:700,borderRadius:"50%",border:`1px solid ${C.gold}08`,pointerEvents:"none"}}/>
-        <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:500,height:500,borderRadius:"50%",border:`1px solid ${C.gold}06`,pointerEvents:"none"}}/>
-        <div style={{maxWidth:820,margin:"0 auto",position:"relative",zIndex:1}}>
-          <div style={{display:"flex",justifyContent:"center",marginBottom:36}}>
+      <div style={{background:`linear-gradient(150deg,${C.navyDeep} 0%,#0D1F52 45%,#112060 75%,#0B1A44 100%)`,padding:"88px 1.5rem 72px",textAlign:"center",position:"relative",overflow:"hidden"}}>
+        {/* Decorative background elements */}
+        <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:800,height:800,borderRadius:"50%",border:`1px solid ${C.gold}07`,pointerEvents:"none"}}/>
+        <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:560,height:560,borderRadius:"50%",border:`1px solid ${C.gold}09`,pointerEvents:"none"}}/>
+        <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:340,height:340,borderRadius:"50%",border:`1px solid ${C.gold}06`,pointerEvents:"none"}}/>
+        {/* Diagonal light sweep */}
+        <div style={{position:"absolute",top:0,left:"-30%",width:"60%",height:"100%",background:"linear-gradient(105deg,transparent 0%,rgba(212,160,23,.03) 50%,transparent 100%)",pointerEvents:"none",transform:"skewX(-15deg)"}}/>
+        {/* Corner accent dots */}
+        <div style={{position:"absolute",top:32,right:48,width:6,height:6,borderRadius:"50%",background:C.gold,opacity:.35,pointerEvents:"none"}}/>
+        <div style={{position:"absolute",top:60,right:72,width:3,height:3,borderRadius:"50%",background:C.gold,opacity:.25,pointerEvents:"none"}}/>
+        <div style={{position:"absolute",bottom:40,left:52,width:5,height:5,borderRadius:"50%",background:C.gold,opacity:.3,pointerEvents:"none"}}/>
+        <div style={{position:"absolute",bottom:70,left:78,width:3,height:3,borderRadius:"50%",background:C.gold,opacity:.2,pointerEvents:"none"}}/>
+
+        <style>{`
+          @keyframes heroFadeUp {
+            from { opacity:0; transform:translateY(24px); }
+            to   { opacity:1; transform:translateY(0); }
+          }
+          @keyframes goldPulse {
+            0%,100% { text-shadow: 0 0 20px rgba(212,160,23,.0); }
+            50%      { text-shadow: 0 0 40px rgba(212,160,23,.4), 0 0 80px rgba(212,160,23,.15); }
+          }
+          @keyframes badgeShimmer {
+            0%   { background-position: -200% center; }
+            100% { background-position: 200% center; }
+          }
+          .hero-h1-anim { animation: heroFadeUp .8s cubic-bezier(.22,1,.36,1) .25s both; }
+          .hero-p-anim  { animation: heroFadeUp .8s cubic-bezier(.22,1,.36,1) .45s both; }
+          .hero-cta-anim{ animation: heroFadeUp .8s cubic-bezier(.22,1,.36,1) .6s both; }
+          .hero-chip-anim{ animation: heroFadeUp .8s cubic-bezier(.22,1,.36,1) .75s both; }
+          .hero-cta-primary:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(212,160,23,.55) !important; }
+          .hero-cta-primary { transition:transform .2s,box-shadow .2s; }
+          .hero-cta-secondary:hover { background:rgba(255,255,255,.1) !important; border-color:rgba(255,255,255,.5) !important; transform:translateY(-2px); }
+          .hero-cta-secondary { transition:all .2s; }
+          .board-chip:hover { background:rgba(212,160,23,.2) !important; border-color:rgba(212,160,23,.7) !important; transform:translateY(-1px); color:#F0B429 !important; }
+          .board-chip { transition:all .2s; }
+        `}</style>
+
+        <div style={{maxWidth:860,margin:"0 auto",position:"relative",zIndex:1}}>
+
+          {/* Logo — animated */}
+          <div style={{display:"flex",justifyContent:"center",marginBottom:32}}>
             <Logo size="xl" onClick={()=>{}}/>
           </div>
-          <div style={{display:"inline-flex",alignItems:"center",gap:8,background:`${C.gold}20`,border:`1px solid ${C.gold}44`,borderRadius:30,padding:"6px 20px",marginBottom:22}}>
-            <span style={{color:C.gold,fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",fontFamily:"sans-serif"}}>Backed by Momentum Nagpur · 22 Years of Excellence</span>
+
+          {/* Premium badge */}
+          <div style={{display:"inline-flex",alignItems:"center",gap:10,marginBottom:28,
+            background:`linear-gradient(135deg,rgba(212,160,23,.18),rgba(212,160,23,.08))`,
+            border:`1px solid rgba(212,160,23,.4)`,borderRadius:40,padding:"9px 24px",
+            backdropFilter:"blur(8px)"}}>
+            <span style={{color:C.gold,fontSize:11,fontWeight:700,letterSpacing:".2em",textTransform:"uppercase",fontFamily:"sans-serif"}}>Backed by Momentum Nagpur</span>
+            <span style={{color:`${C.gold}60`,fontSize:10}}>|</span>
+            <span style={{color:C.goldLight,fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",fontFamily:"sans-serif"}}>22 Years of Excellence</span>
           </div>
-          <h1 style={{color:C.white,fontSize:"clamp(2rem,5vw,3.3rem)",fontWeight:700,lineHeight:1.15,margin:"0 0 16px",fontFamily:"'Playfair Display',Georgia,serif"}}>
-            Expert Home Tutoring<br/><span style={{color:C.gold}}>Class 6 to 12 · JEE · NEET</span>
-          </h1>
-          <p style={{color:"#94A3B8",fontSize:"clamp(.95rem,2vw,1.1rem)",maxWidth:580,margin:"0 auto 10px",fontFamily:"sans-serif",lineHeight:1.75}}>
-            One-to-one personalised coaching at your home — State Board & CBSE — by Momentum-vetted educators across every area of Nagpur.
-          </p>
-          <p style={{color:`${C.goldLight}bb`,fontSize:13,fontFamily:"sans-serif",marginBottom:34}}>
-            📍 Dharampeth · Sadar · Wardhaman Nagar · Civil Lines · Bajaj Nagar · Manish Nagar · and all areas across Nagpur
-          </p>
-          <div style={{display:"flex",gap:14,justifyContent:"center",flexWrap:"wrap",marginBottom:28}}>
-            <button onClick={()=>setPage("inquiry")} style={{background:C.gold,color:C.navyDeep,border:"none",borderRadius:8,padding:"15px 32px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"sans-serif",boxShadow:"0 4px 20px rgba(212,160,23,.45)"}}>📞 Book Free Counselling Session</button>
-            <button onClick={()=>setPage("courses")} style={{background:"transparent",color:C.white,border:`2px solid rgba(255,255,255,.3)`,borderRadius:8,padding:"15px 26px",fontSize:15,fontWeight:600,cursor:"pointer",fontFamily:"sans-serif"}}>View Courses</button>
+
+          {/* ── HERO HEADLINE — premium, clean, no awkward gaps ── */}
+          <div className="hero-h1-anim">
+            <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,color:C.white,fontSize:"clamp(1.9rem,5.2vw,3.4rem)",lineHeight:1.2,marginBottom:10}}>
+              Expert Home Tutoring
+            </div>
+
+            {/* Gold divider pill */}
+            <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:12,marginBottom:12}}>
+              <div style={{height:1,width:48,background:`linear-gradient(to right,transparent,${C.gold}88)`}}/>
+              <div style={{width:6,height:6,borderRadius:"50%",background:C.gold,opacity:.8}}/>
+              <div style={{height:1,width:48,background:`linear-gradient(to left,transparent,${C.gold}88)`}}/>
+            </div>
+
+            {/* Class range — large gold */}
+            <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,
+              color:C.gold,fontSize:"clamp(2rem,5.5vw,3.6rem)",lineHeight:1.1,marginBottom:6,
+              animation:"goldPulse 4s ease-in-out infinite"}}>
+              Class 6 to 12
+            </div>
+
+            {/* Boards row 1: CBSE & State Board */}
+            <div style={{display:"flex",alignItems:"center",justifyContent:"center",flexWrap:"wrap",gap:"0 14px",
+              fontFamily:"'Playfair Display',Georgia,serif",fontWeight:600,
+              color:"#CBD5E0",fontSize:"clamp(1rem,2.6vw,1.55rem)",lineHeight:1.4,marginBottom:4}}>
+              <span>CBSE</span>
+              <span style={{color:`${C.gold}55`,fontWeight:300,margin:"0 2px"}}>·</span>
+              <span>State Board</span>
+            </div>
+
+            {/* Boards row 2: JEE & NEET */}
+            <div style={{display:"flex",alignItems:"center",justifyContent:"center",flexWrap:"wrap",gap:"0 14px",
+              fontFamily:"'Playfair Display',Georgia,serif",fontWeight:600,
+              color:"#CBD5E0",fontSize:"clamp(1rem,2.6vw,1.55rem)",lineHeight:1.4,marginBottom:8}}>
+              <span>JEE</span>
+              <span style={{color:`${C.gold}55`,fontWeight:300,margin:"0 2px"}}>·</span>
+              <span>NEET</span>
+            </div>
+
+            {/* One to One tagline — italic gold */}
+            <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:500,fontStyle:"italic",
+              color:C.goldLight,fontSize:"clamp(.95rem,2.4vw,1.35rem)",letterSpacing:".02em",marginTop:8}}>
+              One to One &nbsp;·&nbsp; At Your Doorstep
+            </div>
           </div>
-          {/* Clickable board chips — scroll down to boards section */}
-          <div style={{marginBottom:10}}>
-            <p style={{color:"#64748B",fontFamily:"sans-serif",fontSize:12,marginBottom:10}}>⬇ Click to jump to your board and select subjects</p>
-            <div style={{display:"flex",justifyContent:"center",gap:10,flexWrap:"wrap"}}>
+
+          <p className="hero-p-anim" style={{color:"#94A3B8",fontSize:"clamp(.95rem,2vw,1.08rem)",maxWidth:560,margin:"18px auto 6px",fontFamily:"sans-serif",lineHeight:1.8}}>
+            Personalised coaching at your home — by Momentum-vetted educators across every area of Nagpur.
+          </p>
+          <p style={{color:`${C.goldLight}99`,fontSize:12.5,fontFamily:"sans-serif",marginBottom:34,animation:"heroFadeUp .8s .5s both"}}>
+            📍 Dharampeth · Sadar · Wardhaman Nagar · Civil Lines · Bajaj Nagar · and all areas across Nagpur
+          </p>
+
+          <div className="hero-cta-anim" style={{display:"flex",gap:14,justifyContent:"center",flexWrap:"wrap",marginBottom:30}}>
+            <button onClick={()=>setPage("inquiry")} className="hero-cta-primary"
+              style={{background:`linear-gradient(135deg,${C.gold},${C.goldLight})`,color:C.navyDeep,border:"none",borderRadius:10,padding:"16px 36px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"sans-serif",boxShadow:"0 4px 24px rgba(212,160,23,.45)"}}>
+              📞 Book Free Counselling Session
+            </button>
+            <button onClick={()=>setPage("courses")} className="hero-cta-secondary"
+              style={{background:"transparent",color:C.white,border:`2px solid rgba(255,255,255,.28)`,borderRadius:10,padding:"16px 28px",fontSize:15,fontWeight:600,cursor:"pointer",fontFamily:"sans-serif"}}>
+              View Courses →
+            </button>
+          </div>
+
+          {/* Clickable board chips */}
+          <div className="hero-chip-anim">
+            <p style={{color:"#4B6280",fontFamily:"sans-serif",fontSize:12,marginBottom:10}}>⬇ Click to jump to your board and select subjects</p>
+            <div style={{display:"flex",justifyContent:"center",gap:8,flexWrap:"wrap"}}>
               {[
                 {l:"Class 6–10 State Board",key:"sb610"},{l:"Class 6–10 CBSE",key:"cbse610"},
                 {l:"Class 11–12 State Board",key:"sb1112"},{l:"Class 11–12 CBSE",key:"cbse1112"},
                 {l:"JEE",key:"jee"},{l:"NEET",key:"neet"},
               ].map(chip=>(
-                <button key={chip.key} onClick={()=>{ scrollTo("boards-section"); }}
-                  style={{background:`${C.white}14`,border:`1.5px solid ${C.gold}55`,borderRadius:30,padding:"8px 20px",color:C.goldLight,fontSize:13,fontFamily:"sans-serif",fontWeight:600,cursor:"pointer",transition:"all .2s"}}>
+                <button key={chip.key} className="board-chip" onClick={()=>{ scrollTo("boards-section"); }}
+                  style={{background:`rgba(255,255,255,.07)`,border:`1.5px solid rgba(212,160,23,.38)`,borderRadius:30,padding:"8px 20px",color:"#A8C0D4",fontSize:12.5,fontFamily:"sans-serif",fontWeight:600,cursor:"pointer"}}>
                   {chip.l}
                 </button>
               ))}
@@ -727,19 +1120,19 @@ function Home({ setPage }) {
       </div>
 
       {/* Stats */}
-      <div style={{background:C.navyDeep,borderBottom:`2px solid ${C.gold}44`,padding:"24px 1.5rem"}}>
+      <div style={{background:`linear-gradient(135deg,${C.navyDeep},#0A1840)`,borderBottom:`1px solid rgba(212,160,23,.25)`,borderTop:`1px solid rgba(212,160,23,.15)`,padding:"28px 1.5rem"}}>
         <div style={{maxWidth:1000,margin:"0 auto",display:"flex",justifyContent:"space-around",flexWrap:"wrap",gap:16}}>
           {[[22,"+","Years Legacy"],[10000,"+","Students Mentored"],[500,"+","JEE/NEET Ranks"],[150,"+","Expert Tutors"]].map(([n,s,l])=>(
-            <div key={l} style={{textAlign:"center"}}>
-              <div style={{color:C.gold,fontSize:"clamp(1.5rem,3vw,2.1rem)",fontWeight:700,fontFamily:"'Playfair Display',Georgia,serif"}}>
+            <div key={l} style={{textAlign:"center",padding:"4px 12px"}}>
+              <div style={{color:C.gold,fontSize:"clamp(1.6rem,3vw,2.2rem)",fontWeight:700,fontFamily:"'Playfair Display',Georgia,serif",letterSpacing:"-.01em"}}>
                 <Counter target={n} suffix={s}/>
               </div>
-              <div style={{color:"#475569",fontSize:11.5,fontFamily:"sans-serif",marginTop:2}}>{l}</div>
+              <div style={{color:"#4A6080",fontSize:11,fontFamily:"sans-serif",marginTop:3,letterSpacing:".08em",textTransform:"uppercase"}}>{l}</div>
             </div>
           ))}
-          <div style={{textAlign:"center"}}>
-            <div style={{color:C.gold,fontSize:"clamp(1.5rem,3vw,2.1rem)",fontWeight:700,fontFamily:"'Playfair Display',Georgia,serif"}}>All</div>
-            <div style={{color:"#475569",fontSize:11.5,fontFamily:"sans-serif",marginTop:2}}>Nagpur Areas</div>
+          <div style={{textAlign:"center",padding:"4px 12px"}}>
+            <div style={{color:C.gold,fontSize:"clamp(1.6rem,3vw,2.2rem)",fontWeight:700,fontFamily:"'Playfair Display',Georgia,serif"}}>All</div>
+            <div style={{color:"#4A6080",fontSize:11,fontFamily:"sans-serif",marginTop:3,letterSpacing:".08em",textTransform:"uppercase"}}>Nagpur Areas</div>
           </div>
         </div>
       </div>
@@ -756,13 +1149,7 @@ function Home({ setPage }) {
         <style>{`@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}`}</style>
       </div>
 
-      {/* Why section */}
-      <WhySlider setPage={setPage}/>
-
-      {/* Features slider */}
-      <FeaturesSlider setPage={setPage}/>
-
-      {/* Premium boards section */}
+      {/* Premium boards section — MOVED UP above Why section */}
       <div style={{background:C.white,padding:"60px 1.5rem"}}>
         <div style={{maxWidth:1100,margin:"0 auto"}}>
           <H2>Choose Your Board or Entrance Exam</H2><Line/>
@@ -773,30 +1160,14 @@ function Home({ setPage }) {
         </div>
       </div>
 
-      {/* How it works — step 3 = location verification, 4 = tutor matched */}
-      <div style={{background:C.off,padding:"60px 1.5rem"}}>
-        <div style={{maxWidth:1000,margin:"0 auto"}}>
-          <H2>How It Works</H2><Line/>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:14}}>
-            {[
-              {n:"01",t:"Submit Enquiry",        d:"Fill our quick form with class, board, subject & area. Under 2 minutes."},
-              {n:"02",t:"Counsellor Calls",       d:"Our academic counsellor calls within 24 hours to understand your needs."},
-              {n:"03",t:"Location Verification",  d:"We verify your exact area in Nagpur and confirm tutor availability near you."},
-              {n:"04",t:"Tutor Matched",           d:"2–3 vetted tutors near your home are shortlisted and introduced to you."},
-              {n:"05",t:"Sessions Begin",          d:"One-to-one classes at your home, your schedule, your pace."},
-            ].map(s=>(
-              <div key={s.n} style={{textAlign:"center",padding:"0 6px"}}>
-                <div style={{width:50,height:50,borderRadius:"50%",background:C.navy,color:C.gold,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:14,margin:"0 auto 12px",fontFamily:"'Playfair Display',Georgia,serif",boxShadow:"0 4px 14px rgba(11,31,78,.25)"}}>{s.n}</div>
-                <div style={{fontSize:13.5,fontWeight:700,color:C.navy,marginBottom:5}}>{s.t}</div>
-                <div style={{fontSize:12,color:C.muted,fontFamily:"sans-serif",lineHeight:1.65}}>{s.d}</div>
-              </div>
-            ))}
-          </div>
-          <div style={{textAlign:"center",marginTop:36}}>
-            <button onClick={()=>setPage("inquiry")} style={{background:C.navy,color:C.white,border:"none",borderRadius:8,padding:"14px 36px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"sans-serif"}}>Book Free Counselling Session →</button>
-          </div>
-        </div>
-      </div>
+      {/* Why section — MOVED DOWN below boards section */}
+      <WhySlider setPage={setPage}/>
+
+      {/* Features slider */}
+      <FeaturesSlider setPage={setPage}/>
+
+      {/* How It Works — Premium cursor-interactive timeline */}
+      <HowItWorks setPage={setPage}/>
 
       {/* Testimonials */}
       <div style={{background:C.white,padding:"60px 1.5rem"}}>
@@ -827,7 +1198,7 @@ function Home({ setPage }) {
           <p style={{color:"#3D2A00",fontFamily:"sans-serif",marginBottom:28,fontSize:15}}>No fee, no commitment. Our counsellor calls within 24 hours and guides you to the right tutor and plan.</p>
           <div style={{display:"flex",gap:14,justifyContent:"center",flexWrap:"wrap"}}>
             <button onClick={()=>setPage("inquiry")} style={{background:C.navyDeep,color:C.white,border:"none",borderRadius:8,padding:"14px 30px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"sans-serif"}}>Book Counselling Session</button>
-            <a href="https://wa.me/919876543210" style={{background:"#25D366",color:C.white,textDecoration:"none",borderRadius:8,padding:"14px 26px",fontSize:15,fontWeight:700,fontFamily:"sans-serif"}}>💬 WhatsApp Now</a>
+            <a href="https://wa.me/918010373753" style={{background:"#25D366",color:C.white,textDecoration:"none",borderRadius:8,padding:"14px 26px",fontSize:15,fontWeight:700,fontFamily:"sans-serif"}}>💬 WhatsApp Now</a>
           </div>
         </div>
       </div>
@@ -1165,7 +1536,7 @@ function Inquiry() {
             </button>
 
             <p style={subStyle}>
-              Or WhatsApp: <strong style={{ color: C.navy }}>+91 YOUR_REAL_NUMBER</strong>
+              Or WhatsApp: <strong style={{ color: C.navy }}>+91 8010373753</strong>
             </p>
           </div>
         )}
@@ -1636,40 +2007,42 @@ const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "Momentum@2025";
 /* ─── Footer ─────────────────────────────────────────────────────────── */
 function Footer({ setPage }) {
   return (
-    <footer style={{background:C.navyDeep,borderTop:`3px solid ${C.gold}`,padding:"50px 1.5rem 26px"}}>
-      <div style={{maxWidth:1100,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(195px,1fr))",gap:36,marginBottom:36}}>
+    <footer style={{background:`linear-gradient(180deg,${C.navyDeep} 0%,#040B1E 100%)`,borderTop:`2px solid rgba(212,160,23,.35)`,padding:"54px 1.5rem 28px"}}>
+      <div style={{maxWidth:1100,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:36,marginBottom:40}}>
         <div>
-          <Logo onClick={()=>setPage("home")}/>
-          <p style={{color:"#334155",fontSize:13,fontFamily:"sans-serif",lineHeight:1.75,marginTop:14}}>Home tutoring for Class 6–12 (CBSE & State Board), JEE & NEET — serving every area of Nagpur. Backed by Momentum Nagpur.</p>
-          <a href="https://wa.me/919876543210" style={{display:"inline-block",marginTop:14,background:"#25D366",color:C.white,textDecoration:"none",borderRadius:8,padding:"8px 16px",fontSize:12,fontWeight:700,fontFamily:"sans-serif"}}>💬 WhatsApp Us</a>
+          <Logo onClick={()=>setPage("home")} size="md"/>
+          <p style={{color:"#94A3B8",fontSize:13,fontFamily:"sans-serif",lineHeight:1.8,marginTop:16}}>Home tutoring for Class 6–12 (CBSE & State Board), JEE & NEET — serving every area of Nagpur. Backed by Momentum Nagpur.</p>
+          <a href="https://wa.me/918010373753" style={{display:"inline-block",marginTop:14,background:"#25D366",color:C.white,textDecoration:"none",borderRadius:8,padding:"9px 18px",fontSize:12,fontWeight:700,fontFamily:"sans-serif"}}>💬 WhatsApp Us</a>
         </div>
         <div>
-          <div style={{color:C.white,fontWeight:600,marginBottom:14,fontFamily:"sans-serif",fontSize:13}}>Quick Links</div>
+          <div style={{color:C.goldLight,fontWeight:700,marginBottom:16,fontFamily:"sans-serif",fontSize:12,letterSpacing:".12em",textTransform:"uppercase"}}>Quick Links</div>
           {[["home","Home"],["about","About Us"],["tutors","Find Tutors"],["courses","Courses"],["inquiry","Book Counselling"],["join","Join as Tutor"]].map(([id,label])=>(
-            <div key={id} style={{marginBottom:9}}><button onClick={()=>setPage(id)} style={{color:"#334155",background:"none",border:"none",cursor:"pointer",fontSize:13,fontFamily:"sans-serif",padding:0}}>{label}</button></div>
+            <div key={id} style={{marginBottom:10}}><button onClick={()=>setPage(id)} style={{color:"#94A3B8",background:"none",border:"none",cursor:"pointer",fontSize:13,fontFamily:"sans-serif",padding:0,transition:"color .2s"}}>{label}</button></div>
           ))}
         </div>
         <div>
-          <div style={{color:C.white,fontWeight:600,marginBottom:14,fontFamily:"sans-serif",fontSize:13}}>Boards & Exams</div>
+          <div style={{color:C.goldLight,fontWeight:700,marginBottom:16,fontFamily:"sans-serif",fontSize:12,letterSpacing:".12em",textTransform:"uppercase"}}>Boards & Exams</div>
           {["Class 6–10 · State Board","Class 6–10 · CBSE","Class 11–12 · State Board (Science)","Class 11–12 · CBSE (Science)","JEE Mains & Advanced","NEET UG"].map(s=>(
-            <div key={s} style={{color:"#334155",fontSize:12.5,fontFamily:"sans-serif",marginBottom:8}}>→ {s}</div>
+            <div key={s} style={{color:"#94A3B8",fontSize:12.5,fontFamily:"sans-serif",marginBottom:9}}>
+              <span style={{color:C.gold,marginRight:6}}>→</span>{s}
+            </div>
           ))}
         </div>
         <div>
-          <div style={{color:C.white,fontWeight:600,marginBottom:14,fontFamily:"sans-serif",fontSize:13}}>Contact</div>
-          <div style={{color:"#334155",fontSize:13,fontFamily:"sans-serif",lineHeight:2.1}}>
+          <div style={{color:C.goldLight,fontWeight:700,marginBottom:16,fontFamily:"sans-serif",fontSize:12,letterSpacing:".12em",textTransform:"uppercase"}}>Contact</div>
+          <div style={{color:"#94A3B8",fontSize:13,fontFamily:"sans-serif",lineHeight:2.2}}>
             <div>📍 Nagpur, Maharashtra — All Areas</div>
-            <div>📞 +91 98765 43210</div>
-            <div>✉ info@1to1hometutors.in</div>
+            <div>📞 +91 8010373753</div>
+            <div>✉ 1to1hometutornagpur@gmail.com</div>
             <div>🕐 Mon–Sat, 9 AM – 7 PM</div>
           </div>
-          <div style={{marginTop:14,background:`${C.gold}18`,border:`1px solid ${C.gold}33`,borderRadius:10,padding:"12px 14px"}}>
-            <div style={{color:C.gold,fontSize:10,fontWeight:700,fontFamily:"sans-serif",letterSpacing:".12em",textTransform:"uppercase"}}>Backed by Momentum Nagpur</div>
-            <div style={{color:"#334155",fontSize:12,fontFamily:"sans-serif",marginTop:4}}>22 Years · Nagpur's Trusted Coaching Brand</div>
+          <div style={{marginTop:16,background:`rgba(212,160,23,.1)`,border:`1px solid rgba(212,160,23,.25)`,borderRadius:10,padding:"14px 16px"}}>
+            <div style={{color:C.gold,fontSize:10.5,fontWeight:700,fontFamily:"sans-serif",letterSpacing:".14em",textTransform:"uppercase"}}>Backed by Momentum Nagpur</div>
+            <div style={{color:"#94A3B8",fontSize:12,fontFamily:"sans-serif",marginTop:5}}>22 Years · Nagpur's Trusted Coaching Brand</div>
           </div>
         </div>
       </div>
-      <div style={{borderTop:"1px solid #0F172A",paddingTop:18,textAlign:"center",color:"#1E293B",fontSize:12,fontFamily:"sans-serif"}}>
+      <div style={{borderTop:`1px solid rgba(255,255,255,.07)`,paddingTop:20,textAlign:"center",color:"#3D5070",fontSize:12,fontFamily:"sans-serif"}}>
         © 2024 1 to 1 Home Tutors · A Momentum Nagpur Initiative · All Rights Reserved
       </div>
     </footer>
@@ -1682,7 +2055,34 @@ export default function App() {
   const sp = (p) => { setPage(p); window.scrollTo({top:0,behavior:"smooth"}); };
   return (
     <div style={{fontFamily:"'Playfair Display',Georgia,serif",background:C.off,minHeight:"100vh",color:C.text}}>
-      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+      <style>{`
+        * { box-sizing: border-box; }
+        ::selection { background: rgba(212,160,23,.28); color: #D4A017; }
+        html { scroll-behavior: smooth; }
+        button { cursor: pointer; }
+        /* Premium scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #060E2A; }
+        ::-webkit-scrollbar-thumb { background: rgba(212,160,23,.4); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(212,160,23,.7); }
+        /* Mobile hero adjustments */
+        @media (max-width: 480px) {
+          .hero-badge-wrap { flex-direction: column !important; gap: 4px !important; text-align: center; padding: 10px 16px !important; }
+          .hero-badge-sep  { display: none !important; }
+          .hero-cta-anim > button { width: 100% !important; justify-content: center; }
+          .hero-chip-anim > div > button { font-size: 11px !important; padding: 6px 13px !important; }
+          .hiw-step-card { padding: 22px 16px !important; }
+        }
+        @media (max-width: 600px) {
+          .hero-cta-anim { flex-direction: column; align-items: center; }
+          .hero-cta-anim > button { width: min(340px, 90vw) !important; }
+        }
+        /* Nav mobile: keep brand readable */
+        @media (max-width: 360px) {
+          .nav-brand-name { font-size: 15px !important; }
+        }
+      `}</style>
       <Nav page={page} setPage={sp}/>
       {page==="home"    && <Home    setPage={sp}/>}
       {page==="about"   && <About   setPage={sp}/>}
